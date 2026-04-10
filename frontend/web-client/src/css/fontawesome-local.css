@@ -1,0 +1,477 @@
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("../assets/fa-solid-900.woff2") format("woff2");
+}
+
+
+.fa-solid,
+.fas {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  line-height: 1;
+}
+
+
+/* Icon definitions used in this project */
+.fa-hand::before {
+  content: "\f256";
+}
+.fa-hand-pointer::before {
+  content: "\f25a";
+}
+.fa-hand-fist::before {
+  content: "\f6de";
+}
+.fa-ruler::before {
+  content: "\f545";
+}
+.fa-bullseye::before {
+  content: "\f140";
+}
+.fa-lock::before {
+  content: "\f023";
+}
+.fa-unlock::before {
+  content: "\f09c";
+}
+.fa-check::before {
+  content: "\f00c";
+}
+.fa-times::before,
+.fa-xmark::before {
+  content: "\f00d";
+}
+.fa-play::before {
+  content: "\f04b";
+}
+.fa-pause::before {
+  content: "\f04c";
+}
+.fa-volume-high::before {
+  content: "\f028";
+}
+.fa-volume-low::before {
+  content: "\f027";
+}
+.fa-volume-off::before,
+.fa-volume-xmark::before {
+  content: "\f6a9";
+}
+.fa-expand::before {
+  content: "\f065";
+}
+.fa-compress::before {
+  content: "\f066";
+}
+.fa-arrows-alt::before,
+.fa-up-down-left-right::before {
+  content: "\f0b2";
+}
+.fa-search-plus::before,
+.fa-magnifying-glass-plus::before {
+  content: "\f00e";
+}
+.fa-search-minus::before,
+.fa-magnifying-glass-minus::before {
+  content: "\f010";
+}
+.fa-home::before,
+.fa-house::before {
+  content: "\f015";
+}
+.fa-cog::before,
+.fa-gear::before {
+  content: "\f013";
+}
+.fa-info-circle::before,
+.fa-circle-info::before {
+  content: "\f05a";
+}
+.fa-question-circle::before,
+.fa-circle-question::before {
+  content: "\f059";
+}
+.fa-exclamation-triangle::before,
+.fa-triangle-exclamation::before {
+  content: "\f071";
+}
+.fa-video::before {
+  content: "\f03d";
+}
+.fa-camera::before {
+  content: "\f030";
+}
+.fa-microphone::before {
+  content: "\f130";
+}
+.fa-microphone-slash::before {
+  content: "\f131";
+}
+.fa-cube::before {
+  content: "\f1b2";
+}
+.fa-cubes::before {
+  content: "\f1b3";
+}
+.fa-file-pdf::before {
+  content: "\f1c1";
+}
+.fa-file-medical::before {
+  content: "\f477";
+}
+.fa-notes-medical::before {
+  content: "\f481";
+}
+.fa-user-md::before,
+.fa-user-doctor::before {
+  content: "\f0f0";
+}
+.fa-heartbeat::before,
+.fa-heart-pulse::before {
+  content: "\f21e";
+}
+.fa-stethoscope::before {
+  content: "\f0f1";
+}
+.fa-syringe::before {
+  content: "\f48e";
+}
+.fa-procedures::before,
+.fa-bed-pulse::before {
+  content: "\f487";
+}
+.fa-hospital::before {
+  content: "\f0f8";
+}
+.fa-hand-pinching::before {
+  content: "\e1a4";
+}
+.fa-arrow-left::before {
+  content: "\f060";
+}
+.fa-arrow-right::before {
+  content: "\f061";
+}
+.fa-arrow-up::before {
+  content: "\f062";
+}
+.fa-arrow-down::before {
+  content: "\f063";
+}
+.fa-chevron-left::before {
+  content: "\f053";
+}
+.fa-chevron-right::before {
+  content: "\f054";
+}
+.fa-chevron-up::before {
+  content: "\f077";
+}
+.fa-chevron-down::before {
+  content: "\f078";
+}
+.fa-spinner::before {
+  content: "\f110";
+}
+.fa-circle-notch::before {
+  content: "\f1ce";
+}
+.fa-sync::before,
+.fa-arrows-rotate::before {
+  content: "\f021";
+}
+.fa-redo::before,
+.fa-rotate-right::before {
+  content: "\f2f9";
+}
+.fa-undo::before,
+.fa-rotate-left::before {
+  content: "\f2ea";
+}
+.fa-signal::before {
+  content: "\f012";
+}
+.fa-wifi::before {
+  content: "\f1eb";
+}
+.fa-gauge::before,
+.fa-tachometer-alt::before {
+  content: "\f625";
+}
+.fa-chart-line::before {
+  content: "\f201";
+}
+.fa-chart-bar::before {
+  content: "\f080";
+}
+.fa-bolt::before {
+  content: "\f0e7";
+}
+.fa-clock::before {
+  content: "\f017";
+}
+.fa-calendar::before {
+  content: "\f133";
+}
+.fa-eye::before {
+  content: "\f06e";
+}
+.fa-eye-slash::before {
+  content: "\f070";
+}
+.fa-list::before {
+  content: "\f03a";
+}
+.fa-grip::before,
+.fa-grip-horizontal::before {
+  content: "\f58d";
+}
+.fa-plus::before {
+  content: "\f067";
+}
+.fa-minus::before {
+  content: "\f068";
+}
+.fa-save::before,
+.fa-floppy-disk::before {
+  content: "\f0c7";
+}
+.fa-trash::before {
+  content: "\f1f8";
+}
+.fa-edit::before,
+.fa-pen-to-square::before {
+  content: "\f044";
+}
+.fa-copy::before {
+  content: "\f0c5";
+}
+.fa-paste::before {
+  content: "\f0ea";
+}
+.fa-download::before {
+  content: "\f019";
+}
+.fa-upload::before {
+  content: "\f093";
+}
+.fa-share::before {
+  content: "\f064";
+}
+.fa-link::before {
+  content: "\f0c1";
+}
+.fa-external-link::before,
+.fa-arrow-up-right-from-square::before {
+  content: "\f08e";
+}
+.fa-comment::before {
+  content: "\f075";
+}
+.fa-comments::before {
+  content: "\f086";
+}
+.fa-bell::before {
+  content: "\f0f3";
+}
+.fa-flag::before {
+  content: "\f024";
+}
+.fa-star::before {
+  content: "\f005";
+}
+.fa-bookmark::before {
+  content: "\f02e";
+}
+.fa-tag::before {
+  content: "\f02b";
+}
+.fa-tags::before {
+  content: "\f02c";
+}
+.fa-folder::before {
+  content: "\f07b";
+}
+.fa-folder-open::before {
+  content: "\f07c";
+}
+.fa-file::before {
+  content: "\f15b";
+}
+.fa-image::before {
+  content: "\f03e";
+}
+.fa-film::before {
+  content: "\f008";
+}
+.fa-music::before {
+  content: "\f001";
+}
+.fa-code::before {
+  content: "\f121";
+}
+.fa-terminal::before {
+  content: "\f120";
+}
+.fa-bug::before {
+  content: "\f188";
+}
+.fa-lightbulb::before {
+  content: "\f0eb";
+}
+.fa-graduation-cap::before {
+  content: "\f19d";
+}
+.fa-book::before {
+  content: "\f02d";
+}
+.fa-map::before {
+  content: "\f279";
+}
+.fa-location-dot::before,
+.fa-map-marker-alt::before {
+  content: "\f3c5";
+}
+.fa-globe::before {
+  content: "\f0ac";
+}
+.fa-language::before {
+  content: "\f1ab";
+}
+.fa-sitemap::before {
+  content: "\f0e8";
+}
+.fa-server::before {
+  content: "\f233";
+}
+.fa-database::before {
+  content: "\f1c0";
+}
+.fa-cloud::before {
+  content: "\f0c2";
+}
+.fa-shield::before,
+.fa-shield-halved::before {
+  content: "\f3ed";
+}
+.fa-key::before {
+  content: "\f084";
+}
+.fa-user::before {
+  content: "\f007";
+}
+.fa-users::before {
+  content: "\f0c0";
+}
+.fa-user-plus::before {
+  content: "\f234";
+}
+.fa-user-minus::before {
+  content: "\f503";
+}
+.fa-user-check::before {
+  content: "\f4fc";
+}
+.fa-sign-in::before,
+.fa-right-to-bracket::before {
+  content: "\f2f6";
+}
+.fa-sign-out::before,
+.fa-right-from-bracket::before {
+  content: "\f2f5";
+}
+.fa-power-off::before {
+  content: "\f011";
+}
+.fa-circle::before {
+  content: "\f111";
+}
+.fa-square::before {
+  content: "\f0c8";
+}
+.fa-bars::before {
+  content: "\f0c9";
+}
+.fa-ellipsis::before,
+.fa-ellipsis-h::before {
+  content: "\f141";
+}
+.fa-ellipsis-vertical::before,
+.fa-ellipsis-v::before {
+  content: "\f142";
+}
+.fa-grip-lines::before {
+  content: "\f7a4";
+}
+.fa-grip-vertical::before {
+  content: "\f58e";
+}
+
+
+/* Animation utility */
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+
+.fa-pulse {
+  animation: fa-spin 1s infinite steps(8);
+}
+
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Size modifiers */
+.fa-xs {
+  font-size: 0.75em;
+}
+.fa-sm {
+  font-size: 0.875em;
+}
+.fa-lg {
+  font-size: 1.25em;
+}
+.fa-xl {
+  font-size: 1.5em;
+}
+.fa-2x {
+  font-size: 2em;
+}
+.fa-3x {
+  font-size: 3em;
+}
+.fa-4x {
+  font-size: 4em;
+}
+.fa-5x {
+  font-size: 5em;
+}
+
+
+/* Fixed width */
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+
+
+
+
+

@@ -1,0 +1,839 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #0a0a0a;
+  color: #fff;
+  font-family:
+    system-ui,
+    Segoe UI,
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+
+/* ============================================================
+    APP LAYOUT
+   ============================================================ */
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+
+/* ============================================================
+    VIDEO SELECTOR PANEL (Flotante)
+   ============================================================ */
+.video-selector {
+  position: fixed;
+  top: 240px;
+  left: 20px;
+  width: 320px;
+  background: rgba(13, 21, 32, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+.video-selector h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.video-source-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px;
+  border-radius: 12px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+.tab-btn.active {
+  background: rgba(25, 118, 210, 0.3);
+  color: #64b5f6;
+}
+.tab-btn:hover:not(.active),
+.tab-btn.pinch-hover:not(.active) {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.tab-content.hidden {
+  display: none;
+}
+
+
+.video-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+.video-item {
+  padding: 18px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.video-item:hover,
+.video-item.pinch-hover {
+  background: rgba(25, 118, 210, 0.3);
+  border-color: rgba(100, 181, 246, 0.5);
+  transform: scale(1.03);
+}
+.video-item.active {
+  background: rgba(76, 175, 80, 0.2);
+  border-color: rgba(129, 199, 132, 0.6);
+}
+.video-item .video-icon {
+  font-size: 28px;
+}
+.video-item .video-name {
+  font-size: 16px;
+  color: #ccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.upload-btn,
+.load-btn {
+  padding: 18px 20px;
+  background: rgba(25, 118, 210, 0.2);
+  border: 2px solid rgba(100, 181, 246, 0.3);
+  border-radius: 12px;
+  color: #64b5f6;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.upload-btn:hover,
+.load-btn:hover,
+.upload-btn.pinch-hover,
+.load-btn.pinch-hover {
+  background: rgba(25, 118, 210, 0.5);
+  border-color: rgba(100, 181, 246, 0.7);
+  transform: scale(1.03);
+}
+
+
+.youtube-input {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 16px;
+}
+.youtube-input:focus {
+  outline: none;
+  border-color: rgba(100, 181, 246, 0.6);
+}
+
+
+/* ============================================================
+    MAIN WORK AREA
+   ============================================================ */
+#col-work {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+
+#workarea {
+  flex: 1;
+  position: relative;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+
+/* Canvas overlay para dibujar manos */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 200;
+}
+
+
+/* ============================================================
+    VIDEO PLAYER
+   ============================================================ */
+#video-player-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+
+#main-video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+
+#youtube-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#youtube-container.hidden {
+  display: none;
+}
+#youtube-player {
+  width: 100%;
+  height: 100%;
+}
+#youtube-player iframe {
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ============================================================
+    GESTURE ZONES (Overlay - estilo YouTube)
+   ============================================================ */
+#gesture-zones {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  pointer-events: none;
+  z-index: 5;
+}
+
+
+.gesture-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+
+.gesture-zone.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+.gesture-zone.feedback {
+  opacity: 1;
+}
+
+
+/* Ripple effect estilo YouTube */
+.ripple-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: ripple-fade 0.8s ease-out;
+}
+
+
+@keyframes ripple-fade {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  30% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+
+.zone-icon {
+  width: 32px;
+  height: 32px;
+  fill: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+
+.zone-icon-lg {
+  width: 56px;
+  height: 56px;
+  fill: #fff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  animation: pulse-play 0.3s ease-out;
+}
+
+
+@keyframes pulse-play {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+
+.zone-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+
+.zone-left.feedback,
+.zone-right.feedback {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+}
+
+
+.zone-center.feedback {
+  background: radial-gradient(circle at center, rgba(0, 0, 0, 0.3) 0%, transparent 50%);
+}
+
+
+.zone-feedback {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.15s ease;
+}
+
+
+.gesture-zone.feedback .zone-feedback:not(.hidden) {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+.zone-feedback.hidden {
+  display: none !important;
+}
+
+
+/* ============================================================
+    VOLUME INDICATOR (Minimalista)
+   ============================================================ */
+#volume-indicator {
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+#volume-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+#volume-indicator.visible {
+  opacity: 1;
+}
+
+
+.vol-icon {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+
+.volume-bar {
+  width: 4px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.volume-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: height 0.1s ease;
+}
+.volume-value {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+
+/* ============================================================
+    CAMERA CONTAINER (oculto pero necesario para MediaPipe)
+   ============================================================ */
+#camera-container {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+#camera-container .input_video {
+  width: 1px;
+  height: 1px;
+}
+
+
+/* ============================================================
+    VIDEO CONTROLS (Minimalista estilo YouTube)
+   ============================================================ */
+#video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 10;
+}
+
+
+#col-work:hover #video-controls,
+#video-controls:focus-within,
+#video-controls.visible {
+  opacity: 1;
+}
+
+
+/* Mostrar handle cuando controles est\u00e1n visibles (gestos o hover) */
+#video-controls.visible .progress-bar {
+  height: 5px;
+}
+
+
+#video-controls.visible .progress-handle {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
+.progress-container {
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+
+.progress-bar {
+  position: relative;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: height 0.1s ease;
+}
+
+
+.progress-bar:hover {
+  height: 5px;
+}
+
+
+.progress-buffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  width: 0%;
+}
+
+
+.progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #f00;
+  width: 0%;
+}
+
+
+.progress-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 12px;
+  height: 12px;
+  background: #f00;
+  border-radius: 50%;
+  left: 0%;
+  transition: transform 0.1s ease;
+}
+
+
+.progress-bar:hover .progress-handle {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+
+.controls-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px 12px;
+  gap: 4px;
+}
+
+
+.ctrl-btn {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 6px;
+}
+
+
+.ctrl-btn svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+
+.ctrl-btn:hover,
+.ctrl-btn.pinch-hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+.ctrl-btn:active {
+  transform: scale(0.95);
+}
+
+
+.ctrl-btn .hidden {
+  display: none;
+}
+
+
+/* Play button ligeramente más grande */
+#btn-play {
+  width: 40px;
+  height: 40px;
+}
+
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: 4px;
+}
+
+
+#volume-slider {
+  width: 0;
+  height: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    width 0.2s ease,
+    opacity 0.2s ease;
+  opacity: 0;
+}
+
+
+.volume-control:hover #volume-slider {
+  width: 60px;
+  opacity: 1;
+  margin-left: 8px;
+}
+
+
+#volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+#volume-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+
+.time-display {
+  font-size: 13px;
+  color: #fff;
+  margin-left: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+
+.time-sep {
+  margin: 0 3px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+
+.spacer {
+  flex: 1;
+}
+
+
+/* ============================================================
+    DASHBOARD BUTTON (Minimalista)
+   ============================================================ */
+.dashboard-btn {
+  position: fixed;
+  top: 80px;
+  left: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 40px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+.dashboard-btn:hover,
+.dashboard-btn.pinch-hover {
+  background: rgba(25, 118, 210, 0.9);
+  border-color: rgba(100, 181, 246, 0.5);
+  transform: scale(1.08);
+}
+.dashboard-btn.dwell-active {
+  background: rgba(76, 175, 80, 0.9);
+  border-color: rgba(129, 199, 132, 0.6);
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+}
+.dashboard-btn .dash-icon {
+  font-size: 52px;
+  color: #fff;
+  line-height: 1;
+}
+.dashboard-btn .dash-label {
+  font-size: 18px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+/* ============================================================
+    GESTURE INDICATOR (Compacto)
+   ============================================================ */
+.gesture-indicator {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  z-index: 100;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+
+.gesture-indicator:hover {
+  opacity: 1;
+}
+
+
+.gesture-indicator .gesture-name {
+  font-size: 12px;
+  color: #fff;
+  font-weight: 500;
+}
+
+
+/* ============================================================
+    HIDDEN UTILITY
+   ============================================================ */
+.hidden {
+  display: none !important;
+}
+
+
+/* ============================================================
+    DOUBLE TAP ANIMATION
+   ============================================================ */
+@keyframes doubleTapPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+.double-tap-indicator {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  animation: doubleTapPulse 0.4s ease-out forwards;
+  pointer-events: none;
+  z-index: 99;
+}
+
+
+/* Animación del icono grande de acción por gesto */
+@keyframes gestureIconPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+
+.gesture-action-icon {
+  position: absolute;
+  top: 50%;
+  font-size: 72px;
+  color: #fff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 100;
+  animation: gestureIconPulse 0.5s ease-out ards;
+}
+
+
+/* ============================================================
+    MAXIMIZED STATE (toggle con gesto)
+   ============================================================ */
+body.maximized .video-selector,
+body.maximized .dashboard-btn,
+body.maximized .gesture-indicator {
+  display: none;
+}
+body.maximized #col-work {
+  width: 100vw;
+}
+body.maximized #workarea {
+  height: 100vh;
+}
+body.maximized #video-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+body.maximized #video-controls:hover {
+  opacity: 1;
+}
+
+
+
+
+

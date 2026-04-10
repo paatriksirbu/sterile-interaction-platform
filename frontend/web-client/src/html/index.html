@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Free Hands Surgery</title>
+
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/hand-tracking.css">
+  <link rel="stylesheet" href="../css/fontawesome-local.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+
+
+  <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+
+  <script crossorigin="anonymous" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script crossorigin="anonymous"
+    src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+
+
+  <!-- <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script> -->
+</head>
+
+
+<body>
+  <div id="pinch-cursor" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="fill"></div>
+    <div class="dot"></div>
+  </div>
+
+
+  <div class="hand-tracking-hud" id="hand-tracking-hud">
+    <div class="hud-header">
+      <span class="hud-title"><i class="fa-solid fa-hand"></i> Hand Tracking</span>
+      <span class="hud-status" id="hud-status">
+        <span class="status-indicator"></span>
+        <span>Active</span>
+      </span>
+    </div>
+    <div class="hud-metric">
+      <span class="hud-metric-label"><i class="fa-solid fa-ruler"></i> Distance</span>
+      <span class="hud-metric-value" id="hud-distance">--</span>
+    </div>
+    <div class="hud-metric">
+      <span class="hud-metric-label"><i class="fa-solid fa-bullseye"></i> Confidence</span>
+      <span class="hud-metric-value" id="hud-confidence">--</span>
+    </div>
+    <div class="warmup-progress" id="warmup-progress">
+      <div class="warmup-label">
+        <span>Warmup</span>
+        <span id="warmup-percent">0%</span>
+      </div>
+      <div class="warmup-bar">
+        <div class="warmup-fill" id="warmup-fill" style="width: 0%"></div>
+      </div>
+    </div>
+    <div class="stability-indicator" id="stability-indicator"></div>
+  </div>
+
+
+  <div class="gesture-feedback-badge" id="gesture-feedback-badge">
+    <i class="fa-solid fa-hand-pointer"></i>
+    <span id="gesture-feedback-text">Pinch detected</span>
+  </div>
+
+
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">FH</div>
+        <div class="patient">
+          <span class="patient-name">DOE, JOHN</span>
+          <span class="patient-sep">—</span>
+          <span class="patient-id">ID: 88291</span>
+        </div>
+      </div>
+
+
+      <div class="header-center">
+        <span class="protocol-title">Surgical Protocol: Knee Arthroplasty</span>
+      </div>
+
+
+      <div class="header-right">
+        <div class="sensor-badge active">
+          <span class="sensor-dot"></span>
+          <span>SENSOR ACTIVE</span>
+        </div>
+        <div class="speech-indicator" id="speech-indicator" style="display: none;">
+          <span class="speech-dot"></span>
+          <span class="speech-label">Recording...</span>
+        </div>
+        <div class="gesture-status" id="gesture-status">
+          <span class="gesture-icon">👆</span>
+          <span class="gesture-label">Gesture:</span>
+          <span class="gesture-value" id="gesture-value">Ready</span>
+        </div>
+      </div>
+    </header>
+
+
+    <div id="app">
+      <main id="col-work">
+        <div id="workarea">
+          <canvas id="overlay"></canvas>
+          <div id="video-container">
+            <video class="input_video" playsinline muted></video>
+          </div>
+
+
+        </div>
+
+
+        <canvas id="hands-overlay"></canvas>
+
+
+        <div id="scroll-rail">
+          <div class="track">
+            <div class="track-bar"></div>
+            <div class="scroll-handle" role="button" aria-label="Scroll handle" style="top: 0%;">
+              <div class="dot-line"></div>
+              <div class="dot-line"></div>
+              <div class="dot-line"></div>
+            </div>
+          </div>
+
+
+          <div class="scroll-label">Scroll</div>
+
+
+          <div class="scroll-footer">
+            <div class="page">PAGE 1</div>
+            <div class="of">OF 1331</div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+
+  </div>
+
+
+  <button id="btn-dashboard" class="dashboard-btn" aria-label="Go to Dashboard">
+    <div class="dash-icon">📊</div>
+    <div class="dash-label">Dashboard</div>
+  </button>
+
+
+  <div id="zoom-controls">
+    <button id="btn-zoom-out" class="zc-btn" aria-label="Zoom Out">
+      <div class="zc-circle">−</div>
+      <div class="zc-label">Zoom Out</div>
+    </button>
+    <div id="zoom-indicator" class="zc-indicator">100%</div>
+    <button id="btn-zoom-in" class="zc-btn" aria-label="Zoom In">
+      <div class="zc-circle">+</div>
+      <div class="zc-label">Zoom In</div>
+    </button>
+  </div>
+
+
+  <script type="module" src="../js/main.js"></script>
+</body>
+
+
+</html>

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="es">
+
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3D Viewer</title>
+
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/viewer3d.css">
+  <link rel="stylesheet" href="../css/hand-tracking.css">
+  <link rel="stylesheet" href="../css/fontawesome-local.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32x32.png">
+
+
+
+
+  <!-- Import map  -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/+esm",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+
+
+<body class="mediscan">
+
+
+  <!-- Pinch Cursor -->
+  <div id="pinch-cursor" aria-hidden="true">
+    <div class="ring"></div>
+    <div class="fill"></div>
+    <div class="dot"></div>
+  </div>
+
+
+  <!-- Hand Tracking HUD -->
+  <div class="hand-tracking-hud" id="hand-tracking-hud">
+    <div class="hud-header">
+      <span class="hud-title"><i class="fa-solid fa-hand"></i> Hand Tracking</span>
+      <span class="hud-status" id="hud-status">
+        <span class="status-indicator"></span>
+        <span>Active</span>
+      </span>
+    </div>
+    <div class="hud-metric">
+      <span class="hud-metric-label"><i class="fa-solid fa-ruler"></i> Distance</span>
+      <span class="hud-metric-value" id="hud-distance">--</span>
+    </div>
+    <div class="hud-metric">
+      <span class="hud-metric-label"><i class="fa-solid fa-bullseye"></i> Confidence</span>
+      <span class="hud-metric-value" id="hud-confidence">--</span>
+    </div>
+    <div class="warmup-progress" id="warmup-progress">
+      <div class="warmup-label">
+        <span>Warmup</span>
+        <span id="warmup-percent">0%</span>
+      </div>
+      <div class="warmup-bar">
+        <div class="warmup-fill" id="warmup-fill" style="width: 0%"></div>
+      </div>
+    </div>
+    <div class="stability-indicator" id="stability-indicator"></div>
+  </div>
+
+
+  <!-- Gesture Feedback Badge -->
+  <div class="gesture-feedback-badge" id="gesture-feedback-badge">
+    <i class="fa-solid fa-hand-pointer"></i>
+    <span id="gesture-feedback-text">Pinch detected</span>
+  </div>
+
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <button class="btn-back" onclick="history.back()" type="button">
+      <span class="icon">←</span> BACK
+    </button>
+
+
+    <div class="titleblock">
+      <div class="title">MEDISCAN OR V2.4</div>
+      <div class="subtitle">
+        Patient ID: 98234-A &nbsp;·&nbsp; Series: Torso MRI (T2 Weighted)
+      </div>
+    </div>
+
+
+    <div class="statusblock">
+      <span class="pill sensor">
+        <span class="dot"></span> SENSOR ACTIVE
+      </span>
+      <div class="userchip">
+        <div class="usertext">
+          <div class="small">Logged in as</div>
+          <div class="name">Dr. Aris Thorne</div>
+        </div>
+        <div class="avatar"></div>
+      </div>
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main id="workarea" class="workarea fullscreenStage">
+    <!-- Canvas 3D -->
+    <canvas id="three-canvas"></canvas>
+
+
+    <!-- ✅ Overlay: IMPORTANTE que NO capture clicks -->
+    <canvas id="overlay"></canvas>
+
+
+    <!-- ✅ Video oculto correctamente (no display:none) -->
+    <video class="input_video" autoplay muted playsinline
+      style="position:fixed; left:-10000px; top:0; width:1px; height:1px; opacity:0; pointer-events:none;">
+    </video>
+
+
+    <div id="info" class="info-panel"></div>
+
+
+    <!-- ✅ Opcional: etiqueta del modelo actual -->
+    <div id="modelLabel" class="modelLabel" aria-hidden="true"></div>
+
+
+    <!-- ✅ Flechas (botones reales) -->
+    <button id="btn-prev" class="navCircle navLeft" aria-label="Prev" type="button">‹</button>
+    <button id="btn-next" class="navCircle navRight" aria-label="Next" type="button">›</button>
+
+
+    <!-- Bottom left: zoom -->
+    <section class="bottomLeft">
+      <div class="hintRow">
+        <span class="hintIcon">🖐️</span>
+        <span>TWO-HAND PINCH TO ZOOM | PINCH + DRAG TO MOVE</span>
+        <span id="zoom-indicator" class="zoomValue">145%</span>
+      </div>
+
+
+      <div class="zoomPanel">
+        <input id="zoomSlider" class="zoomSlider" type="range" min="50" max="200" value="145">
+        <div class="minmax">
+          <span>MIN (50%)</span>
+          <span>MAX (200%)</span>
+        </div>
+
+
+        <div class="zoomButtons">
+          <button id="btn-zoom-out" class="miniBtn" type="button">-</button>
+          <button id="btn-zoom-in" class="miniBtn" type="button">+</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Bottom right: depth -->
+    <section class="bottomRight">
+      <div class="depthCard">
+        <canvas id="depthCanvas" width="260" height="120"></canvas>
+        <div class="depthLabel">DEPTH SENSOR 01</div>
+      </div>
+    </section>
+  </main>
+
+
+  <!-- ✅ MediaPipe (OBLIGATORIO) - antes del módulo -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <!-- Opcional -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+
+
+  <!-- TU APP -->
+  <script type="module" src="../js/viewer3d/viewer3d.js"></script>
+</body>
+
+
+</html>
+
+
+</html>
+
