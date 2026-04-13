@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Annotation profile for surgical-system" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.32/lombok-1.18.32.jar" />
+        </processorPath>
+        <module name="notifier-service" />
+        <module name="gesture-service" />
+        <module name="api-gateway" />
+        <module name="resource-service" />
+        <module name="annotation-service" />
+        <module name="orchestrator-service" />
+        <module name="speech-service" />
+        <module name="surgical-shared-events" />
+        <module name="session-service" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="annotation-service" options="" />
+      <module name="api-gateway" options="" />
+      <module name="gesture-service" options="" />
+      <module name="notifier-service" options="" />
+      <module name="orchestrator-service" options="" />
+      <module name="resource-service" options="" />
+      <module name="session-service" options="" />
+      <module name="speech-service" options="" />
+    </option>
+  </component>
+</project>
