@@ -189,7 +189,7 @@
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  will-change: top;
+  will-change: transform;
 }
 
 

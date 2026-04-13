@@ -1557,7 +1557,7 @@ body {
   opacity: 0.5;
 }
 
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .step-item,
   .nav-btn,
   .checklist-item,
