@@ -15,13 +15,13 @@ public class SessionStateController {
     private final SessionStateService sessionStateService;
 
     @GetMapping("/{sessionId}")
-    public ResponseEntity<SessionContextDTO> getSession(@PathVariable String sessionId) {
+    public ResponseEntity<SessionContextDTO> getSession(@PathVariable("sessionId") String sessionId) {
         return ResponseEntity.ok(sessionStateService.getSession(sessionId));
     }
 
     @PostMapping("/{sessionId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public SessionContextDTO createSession(@PathVariable String sessionId) {
+    public SessionContextDTO createSession(@PathVariable("sessionId") String sessionId) {
         return sessionStateService.createSession(sessionId);
     }
 }

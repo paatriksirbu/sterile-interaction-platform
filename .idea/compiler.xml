@@ -21,22 +21,23 @@
         <module name="resource-service" />
         <module name="annotation-service" />
         <module name="orchestrator-service" />
-        <module name="speech-service" />
         <module name="surgical-shared-events" />
+        <module name="speech-service" />
         <module name="session-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="annotation-service" options="" />
-      <module name="api-gateway" options="" />
-      <module name="gesture-service" options="" />
-      <module name="notifier-service" options="" />
-      <module name="orchestrator-service" options="" />
-      <module name="resource-service" options="" />
-      <module name="session-service" options="" />
-      <module name="speech-service" options="" />
+      <module name="annotation-service" options="-parameters" />
+      <module name="api-gateway" options="-parameters" />
+      <module name="gesture-service" options="-parameters" />
+      <module name="notifier-service" options="-parameters" />
+      <module name="orchestrator-service" options="-parameters" />
+      <module name="resource-service" options="-parameters" />
+      <module name="session-service" options="-parameters" />
+      <module name="speech-service" options="-parameters" />
+      <module name="surgical-shared-events" options="-parameters" />
     </option>
   </component>
 </project>
