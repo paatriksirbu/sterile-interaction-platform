@@ -54,6 +54,9 @@ public class NotificationServiceImpl implements NotificationService {
         return switch (event.commandType()) {
             case SELECT   -> NotificationMessage.of("ACTION",  "Elemento seleccionado");
             case NAVIGATE -> NotificationMessage.of("ACTION",  "Navegación activada");
+            case NEXT     -> NotificationMessage.of("ACTION",  "Siguiente elemento");
+            case PREVIOUS -> NotificationMessage.of("ACTION",  "Elemento anterior");
+            case PAUSE    -> NotificationMessage.of("WARNING", "Sesión pausada");
             case LOCK     -> NotificationMessage.of("WARNING", "Sistema bloqueado/desbloqueado");
             case NO_OP    -> null;
         };

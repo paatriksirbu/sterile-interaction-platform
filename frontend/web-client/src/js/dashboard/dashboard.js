@@ -21,7 +21,7 @@ export function triggerDashboardAction(action) {
 
 
     case "live":
-      window.location.href = "/frontend/web-client/src/htmllive_feed.html";
+      window.location.href = "/frontend/web-client/src/html/live_feed.html";
       break;
 
 

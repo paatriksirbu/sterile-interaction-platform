@@ -21,8 +21,8 @@
         <module name="resource-service" />
         <module name="annotation-service" />
         <module name="orchestrator-service" />
-        <module name="surgical-shared-events" />
         <module name="speech-service" />
+        <module name="surgical-shared-events" />
         <module name="session-service" />
       </profile>
     </annotationProcessing>

@@ -10,6 +10,9 @@ public final class GestureCommandMapper {
     public static InteractionCommandType toCommandType(GestureType gestureType) {
         return switch (gestureType) {
             case PINCH, APPROVAL      -> InteractionCommandType.SELECT;
+            case SWIPE_RIGHT          -> InteractionCommandType.NEXT;
+            case SWIPE_LEFT           -> InteractionCommandType.PREVIOUS;
+            case FIST                 -> InteractionCommandType.PAUSE;
             case POINTING, SPHERICAL  -> InteractionCommandType.NAVIGATE;
             case LOCK_GESTURE         -> InteractionCommandType.LOCK;
             case CLOSED_FIST,

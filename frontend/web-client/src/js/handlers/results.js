@@ -8,7 +8,7 @@ import { annotationManager } from "../objects/annotationManager.js";
 import { clearCanvas, applyMirror } from "../utils/canvas.js";
 import { normToPx } from "../utils/transforms.js";
 import { getThumbIndexPinchPositions } from "../gestures/pinch.js";
-import { processDashboardGestures } from "../Dashboard/dashboard_gestures.js";
+import { processDashboardGestures } from "../dashboard/dashboard_gestures.js";
 
 import { drawAllHands } from "../rendering/hands.js";
 import { drawProgressArc } from "../rendering/progress.js";

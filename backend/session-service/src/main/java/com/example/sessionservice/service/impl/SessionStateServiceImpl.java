@@ -1,6 +1,10 @@
 package com.example.sessionservice.service.impl;
 
 import com.example.sessionservice.config.RabbitConfig;
+import com.example.sessionservice.dto.ActionRequest;
+import com.example.sessionservice.dto.PatchSessionRequest;
+import com.example.sessionservice.dto.UpdateResourceRequest;
+import com.example.sessionservice.dto.UpdateViewerRequest;
 import com.example.sessionservice.exception.SessionAlreadyExistsException;
 import com.example.sessionservice.exception.SessionNotFoundException;
 import com.example.sessionservice.model.SessionState;
@@ -47,29 +51,20 @@ public class SessionStateServiceImpl implements SessionStateService {
             return;
         }
 
-        applyCommand(session, event.commandType());
+        applyCommandLogic(session, event.commandType());
         session.setLastUpdatedAt(Instant.now());
         sessionStateRepository.save(session);
 
-        SessionChangedEvent changedEvent = SessionChangedEvent.of(
-                session.getSessionId(),
-                session.getStatus(),
-                session.getActiveViewer(),
-                event.commandType()
-        );
-        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.SESSION_CHANGED_ROUTING_KEY, changedEvent);
+        publishSessionChanged(session, event.commandType());
 
-        log.info("[SESSION] State updated — sessionId={}, status={}, viewer={}, lastCommand={}, newEventId={}",
-                session.getSessionId(), session.getStatus(), session.getActiveViewer(),
-                session.getLastCommand(), changedEvent.eventId());
+        log.info("[SESSION] State updated — sessionId={}, status={}, viewer={}, lastAction={}",
+                session.getSessionId(), session.getStatus(), session.getActiveViewer(), session.getLastAction());
     }
 
     @Override
     @Transactional(readOnly = true)
     public SessionContextDTO getSession(String sessionId) {
-        SessionState session = sessionStateRepository.findById(sessionId)
-                .orElseThrow(() -> new SessionNotFoundException(sessionId));
-        return toDto(session);
+        return toDto(findOrThrow(sessionId));
     }
 
     @Override
@@ -83,23 +78,111 @@ public class SessionStateServiceImpl implements SessionStateService {
         return toDto(saved);
     }
 
-    private void applyCommand(SessionState session, InteractionCommandType commandType) {
-        if (commandType == InteractionCommandType.LOCK) {
-            SessionStatus toggled = session.getStatus() == SessionStatus.LOCKED
-                    ? SessionStatus.ACTIVE
-                    : SessionStatus.LOCKED;
-            session.setStatus(toggled);
-            log.info("[SESSION] Lock toggled: sessionId={}, newStatus={}", session.getSessionId(), toggled);
+    @Override
+    @Transactional
+    public SessionContextDTO patchSession(String sessionId, PatchSessionRequest request) {
+        SessionState session = findOrThrow(sessionId);
+        if (request.status() != null) session.setStatus(request.status());
+        if (request.activeViewer() != null) session.setActiveViewer(request.activeViewer());
+        if (request.activeResourceId() != null) session.setActiveResourceId(request.activeResourceId());
+        if (request.lastAction() != null) session.setLastAction(request.lastAction());
+        session.setLastUpdatedAt(Instant.now());
+        sessionStateRepository.save(session);
+        log.info("[SESSION] Session patched: sessionId={}, status={}, viewer={}", sessionId, session.getStatus(), session.getActiveViewer());
+        return toDto(session);
+    }
+
+    @Override
+    @Transactional
+    public SessionContextDTO updateViewer(String sessionId, UpdateViewerRequest request) {
+        SessionState session = findOrThrow(sessionId);
+        ViewerType previous = session.getActiveViewer();
+        session.setActiveViewer(request.viewer());
+        session.setLastUpdatedAt(Instant.now());
+        sessionStateRepository.save(session);
+        publishSessionChanged(session, session.getLastAction());
+        log.info("[SESSION] Viewer updated: sessionId={}, {} -> {}", sessionId, previous, request.viewer());
+        return toDto(session);
+    }
+
+    @Override
+    @Transactional
+    public SessionContextDTO updateResource(String sessionId, UpdateResourceRequest request) {
+        SessionState session = findOrThrow(sessionId);
+        session.setActiveResourceId(request.resourceId());
+        session.setLastUpdatedAt(Instant.now());
+        sessionStateRepository.save(session);
+        log.info("[SESSION] Resource updated: sessionId={}, resourceId={}", sessionId, request.resourceId());
+        return toDto(session);
+    }
+
+    @Override
+    @Transactional
+    public SessionContextDTO applyAction(String sessionId, ActionRequest request) {
+        SessionState session = findOrThrow(sessionId);
+
+        if (session.getStatus() == SessionStatus.LOCKED
+                && request.action() != InteractionCommandType.LOCK) {
+            log.warn("[SESSION] Action rejected — session is LOCKED: action={}, sessionId={}", request.action(), sessionId);
+            return toDto(session);
         }
-        session.setLastCommand(commandType);
+
+        applyCommandLogic(session, request.action());
+        session.setLastUpdatedAt(Instant.now());
+        sessionStateRepository.save(session);
+        publishSessionChanged(session, request.action());
+        log.info("[SESSION] Action applied: sessionId={}, action={}, status={}", sessionId, request.action(), session.getStatus());
+        return toDto(session);
+    }
+
+    private void applyCommandLogic(SessionState session, InteractionCommandType commandType) {
+        switch (commandType) {
+            case LOCK -> {
+                SessionStatus toggled = session.getStatus() == SessionStatus.LOCKED
+                        ? SessionStatus.ACTIVE
+                        : SessionStatus.LOCKED;
+                session.setStatus(toggled);
+                log.info("[SESSION] Lock toggled: sessionId={}, newStatus={}", session.getSessionId(), toggled);
+            }
+            case PAUSE -> {
+                session.setStatus(SessionStatus.PAUSED);
+                log.info("[SESSION] Session paused: sessionId={}", session.getSessionId());
+            }
+            case SELECT, NEXT, PREVIOUS, NAVIGATE -> {
+                if (session.getStatus() == SessionStatus.PAUSED) {
+                    session.setStatus(SessionStatus.ACTIVE);
+                    log.info("[SESSION] Session resumed by action {}: sessionId={}", commandType, session.getSessionId());
+                }
+            }
+            default -> { /* NO_OP: no state change */ }
+        }
+        session.setLastAction(commandType);
+    }
+
+    private void publishSessionChanged(SessionState session, InteractionCommandType triggeringCommand) {
+        SessionChangedEvent event = SessionChangedEvent.of(
+                session.getSessionId(),
+                session.getStatus(),
+                session.getActiveViewer(),
+                triggeringCommand
+        );
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.SESSION_CHANGED_ROUTING_KEY, event);
+        log.debug("[SESSION] SessionChangedEvent published: eventId={}", event.eventId());
+    }
+
+    private SessionState findOrThrow(String sessionId) {
+        return sessionStateRepository.findById(sessionId)
+                .orElseThrow(() -> new SessionNotFoundException(sessionId));
     }
 
     private SessionState buildNewSession(String sessionId) {
+        Instant now = Instant.now();
         return SessionState.builder()
                 .sessionId(sessionId)
                 .activeViewer(ViewerType.DASHBOARD)
                 .status(SessionStatus.ACTIVE)
-                .lastUpdatedAt(Instant.now())
+                .createdAt(now)
+                .lastUpdatedAt(now)
                 .build();
     }
 
@@ -109,6 +192,9 @@ public class SessionStateServiceImpl implements SessionStateService {
                 .activeViewer(s.getActiveViewer())
                 .status(s.getStatus())
                 .activeResourceId(s.getActiveResourceId())
+                .lastAction(s.getLastAction())
+                .createdAt(s.getCreatedAt())
+                .updatedAt(s.getLastUpdatedAt())
                 .build();
     }
 }

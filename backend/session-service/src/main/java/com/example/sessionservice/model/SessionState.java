@@ -35,8 +35,11 @@ public class SessionState {
     private String activeResourceId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "last_command")
-    private InteractionCommandType lastCommand;
+    @Column(name = "last_action")
+    private InteractionCommandType lastAction;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Column(name = "last_updated_at", nullable = false)
     private Instant lastUpdatedAt;
