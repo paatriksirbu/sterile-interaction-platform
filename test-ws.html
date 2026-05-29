@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h3>Notifier WebSocket Test</h3>
+<pre id="log"></pre>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+    const log = msg => {
+        document.getElementById("log").textContent += msg + "\n";
+        console.log(msg);
+    };
+
+    const socket = new SockJS("http://localhost:8085/ws-notifications");
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+        log("Connected to notifier WebSocket");
+
+        stomp.subscribe("/topic/notifications", msg => {
+            log("Received: " + msg.body);
+        });
+    }, err => {
+        log("WebSocket error: " + err);
+    });
+</script>
+</body>
+</html>
