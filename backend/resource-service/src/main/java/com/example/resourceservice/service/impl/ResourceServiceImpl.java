@@ -92,6 +92,15 @@ public class ResourceServiceImpl implements ResourceService {
         log.info("[RESOURCE] Deleted: id={}", resourceId);
     }
 
+    @Override
+    public List<ResourceDTO> searchResources(String query) {
+        List<ResourceDTO> results = resourceRepository.findByKeyword(query).stream()
+                .map(this::toDto)
+                .toList();
+        log.debug("[RESOURCE] Search query='{}': count={}", query, results.size());
+        return results;
+    }
+
     private Resource findOrThrow(String resourceId) {
         return resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new ResourceNotFoundException(resourceId));

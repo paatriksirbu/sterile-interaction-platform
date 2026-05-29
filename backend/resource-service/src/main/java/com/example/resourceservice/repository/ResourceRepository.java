@@ -25,6 +25,14 @@ public class ResourceRepository {
                 .toList();
     }
 
+    public List<Resource> findByKeyword(String keyword) {
+        String lower = keyword.toLowerCase();
+        return store.values().stream()
+                .filter(r -> (r.getTitle() != null && r.getTitle().toLowerCase().contains(lower))
+                        || (r.getDescription() != null && r.getDescription().toLowerCase().contains(lower)))
+                .toList();
+    }
+
     public Optional<Resource> findById(String id) {
         return Optional.ofNullable(store.get(id));
     }

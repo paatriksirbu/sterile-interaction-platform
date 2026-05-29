@@ -30,6 +30,11 @@ public class ResourceController {
         return ResponseEntity.ok(resourceService.getResourceById(resourceId));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ResourceDTO>> searchResources(@RequestParam String q) {
+        return ResponseEntity.ok(resourceService.searchResources(q));
+    }
+
     @GetMapping("/type/{type}")
     public ResponseEntity<List<ResourceDTO>> getResourcesByType(@PathVariable ResourceType type) {
         return ResponseEntity.ok(resourceService.getResourcesByType(type));

@@ -20,4 +20,6 @@ public interface ResourceService {
     ResourceDTO updateResource(String resourceId, UpdateResourceRequest request);
 
     void deleteResource(String resourceId);
+
+    List<ResourceDTO> searchResources(String query);
 }

@@ -3,7 +3,10 @@ package com.surgical.notifier.service.impl;
 import com.example.shared.events.InteractionCommandEvent;
 import com.surgical.notifier.dto.NotificationMessage;
 import com.surgical.notifier.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,7 +16,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     private static final int MAX_SIZE = 50;
 
@@ -62,8 +68,8 @@ public class NotificationServiceImpl implements NotificationService {
         };
     }
 
-    // Hook for WebSocket push — activate WebSocketConfig and inject SimpMessagingTemplate here
-    private void pushToFrontend(NotificationMessage notification) {
-        log.debug("[NOTIFIER] pushToFrontend: id={}, type={}", notification.id(), notification.type());
+    private void pushToFrontend(@NonNull NotificationMessage notification) {
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        log.debug("[NOTIFIER] WebSocket push: id={}, type={}", notification.id(), notification.type());
     }
 }

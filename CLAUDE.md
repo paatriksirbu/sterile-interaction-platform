@@ -3,6 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## What This Is
+This is my final univeristy project: sterile touchless interaction system for operating room scenarios.
 
 A sterile-interaction platform for surgical environments: surgeons control a medical viewer (PDFs, 3D models, video) hands-free using hand gestures captured by MediaPipe in the browser. Gestures flow through a backend event pipeline into session and notification services.
 
@@ -112,3 +113,35 @@ Vanilla JS ES modules, no build step or bundler. Served directly from the filesy
 - **Dockerfiles build from the repo root** (not from the service directory). The build context is always `.` and the Dockerfile path is passed via `dockerfile:` in docker-compose.
 - **WebSocket push is not yet active** in notifier-service — `pushToFrontend` only logs.
 - The `config.local.js` file is gitignored. To use Azure Speech-to-Text, create it at `frontend/web-client/src/js/config.local.js` with `export const LOCAL_CONFIG = { AZURE_SPEECH: { SUBSCRIPTION_KEY: "...", REGION: "..." } }`.
+
+## Mandatory Claude Code Workflow
+
+Before editing code:
+1. Inspect only the relevant files.
+2. Identify existing conventions.
+3. Propose a minimal plan.
+4. Wait for approval unless the task explicitly says "implement now".
+
+During implementation:
+- Modify only files required by the task.
+- Do not refactor unrelated services.
+- Do not duplicate shared event contracts.
+- Prefer small vertical slices over large rewrites.
+- After changes, return changed files and exact test commands.
+
+Token discipline:
+- Do not summarize unchanged files.
+- Do not paste full files unless requested.
+- Use subagents for exploration-heavy tasks.
+- Compact after each completed milestone.
+
+You are allowed to:
+- read files
+- edit files
+- run maven commands
+- run docker compose commands
+
+Do not ask for confirmation unless:
+- deleting files
+- modifying database schemas
+- changing shared event contracts

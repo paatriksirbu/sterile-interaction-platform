@@ -1,6 +1,0 @@
-com/example/shared/events/GestureDetectedEvent.class
-com/example/shared/enums/ResourceType.class
-com/example/shared/events/InteractionCommandEvent.class
-com/example/shared/events/SessionChangedEvent.class
-com/example/shared/enums/InteractionCommandType.class
-com/example/shared/enums/CommandType.class
