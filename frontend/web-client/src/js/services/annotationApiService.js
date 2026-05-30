@@ -1,6 +1,6 @@
 import { annotationManager } from '../objects/annotationManager.js';
+import { getSessionId } from './sessionContextService.js';
 
-const SESSION_ID = 'frontend-session';
 const RESOURCE_ID = 'surgical-pdf-main';
 const VIEWER_TYPE = 'PDF';
 const ENDPOINT = 'http://localhost:8088/api/annotations';
@@ -9,7 +9,7 @@ const FALLBACK_TEXT = 'Anotación creada por gesto';
 
 function postAnnotation(annotationText) {
   var payload = {
-    sessionId: SESSION_ID,
+    sessionId: getSessionId(),
     resourceId: RESOURCE_ID,
     annotationText: annotationText || FALLBACK_TEXT,
     viewerType: VIEWER_TYPE

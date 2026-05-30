@@ -590,6 +590,11 @@ class MultiHandGestureDetector {
         confirmed: false,
         frameCount: 0,
       },
+      lock: handStates[0]?.lock || {
+        detected: false,
+        confirmed: false,
+        frameCount: 0,
+      },
 
       anyPinch: anyPinchConfirmed,
       anyPointing: anyPointingConfirmed,

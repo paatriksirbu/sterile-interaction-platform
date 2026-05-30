@@ -40,6 +40,7 @@ import {
   initCanvasClickListeners,
 } from "../interactions/annotations.js";
 import { processCursor, resetCursorSmoothing } from "../interactions/cursor.js";
+import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 
 export { initCanvasClickListeners };
 
@@ -93,6 +94,7 @@ export function onResults(results) {
     gestureState = gestureDetector.detectAll(hands, handedness);
     // Usar las manos más prioritarias para las interacciones
     prioritizedHands = gestureState.prioritizedLandmarks || hands;
+    sendGestureIfConfirmed(gestureState);
 
     // Update hand tracking HUD visualization
     updateHandTrackingHUD(hands, handedness, gestureState);
