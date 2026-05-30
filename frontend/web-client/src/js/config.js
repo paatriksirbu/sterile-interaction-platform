@@ -1,12 +1,12 @@
-let LOCAL_CONFIG = null;
-try {
-  const localModule = await import("./config.local.js");
-  LOCAL_CONFIG = localModule.LOCAL_CONFIG;
-  console.log("✅ Configuración local cargada correctamente");
-} catch (e) {
-  console.warn("⚠️ No se encontró config.local.js");
-  console.error(e);
-}
+// let LOCAL_CONFIG = null;
+// try {
+//   const localModule = await import("./config.local.js");
+//   LOCAL_CONFIG = localModule.LOCAL_CONFIG;
+//   console.log("✅ Configuración local cargada correctamente");
+// } catch (e) {
+//   console.warn("⚠️ No se encontró config.local.js");
+//   console.error(e);
+// }
 
 export const CONFIG = {
   // Modo espejo para cámara frontal (false = sin inversión, mano izquierda a la izquierda)
@@ -68,13 +68,13 @@ export const CONFIG = {
     MAX_TEXT_WIDTH: 300,
   },
 
-  // Azure Speech Service (Speech-to-Text)
-  AZURE_SPEECH: {
-    SUBSCRIPTION_KEY: LOCAL_CONFIG?.AZURE_SPEECH?.SUBSCRIPTION_KEY || "",
-    REGION: LOCAL_CONFIG?.AZURE_SPEECH?.REGION || "westeurope",
-    LANGUAGE: "es-ES",
-    MAX_RECORDING_MS: 5000,
-  },
+  // // Azure Speech Service (Speech-to-Text)
+  // AZURE_SPEECH: {
+  //   SUBSCRIPTION_KEY: LOCAL_CONFIG?.AZURE_SPEECH?.SUBSCRIPTION_KEY || "",
+  //   REGION: LOCAL_CONFIG?.AZURE_SPEECH?.REGION || "westeurope",
+  //   LANGUAGE: "es-ES",
+  //   MAX_RECORDING_MS: 5000,
+  // },
 
   FRAMES: {
     PINCH: 5,

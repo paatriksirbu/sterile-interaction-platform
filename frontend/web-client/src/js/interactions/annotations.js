@@ -3,11 +3,11 @@ import {
   annotationManager,
   ANNOTATION_TYPES,
 } from "../objects/annotationManager.js";
+import { recognizeAndPost } from "../services/annotationApiService.js";
 import { getThumbIndexPinchPositions } from "../gestures/pinch.js";
 import { normToPx } from "../utils/transforms.js";
 import { interactionState, CANVAS_ANN_PANEL_COOLDOWN_MS } from "./state.js";
 import { isIndexExtended, showGestureFeedback } from "./pdfZoom.js";
-import { speechAnnotation } from "../services/speechAnnotation.js";
 
 /* ============================================================
     CONFIGURACIÓN DEL PANEL
@@ -201,11 +201,7 @@ export function processAnnotationPointing(hands, gestureState, ctx, canvas) {
         interactionState.annotationDwellPdfCoords.y,
       );
       showAnnotationFeedback(arcX, arcY, ctx, canvas);
-
-      // Iniciar grabación de voz con Azure Speech si está habilitada
-      if (cfg.SPEECH_ENABLED !== false && cfg.SPEECH_AUTO_START !== false) {
-        speechAnnotation.startRecordingForAnnotation(newAnnotation.id);
-      }
+      recognizeAndPost(newAnnotation.id);
     }
 
     interactionState.annotationDwellPos = null;
