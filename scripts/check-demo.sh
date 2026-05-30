@@ -98,6 +98,11 @@ echo ""
 
 # ── backend services: port checks ─────────────────────────────────────────────
 
+blue "── API Gateway ──"
+check_port   "api-gateway        " 8080
+check_health "api-gateway health " "http://localhost:8080/actuator/health"
+echo ""
+
 blue "── Backend services (port) ──"
 check_port "gesture-service    " 8082
 check_port "session-service    " 8084
@@ -136,7 +141,11 @@ echo ""
 if $SMOKE; then
   blue "── Smoke tests (--smoke) ──"
 
-  smoke_post "gesture-service" \
+  smoke_post "gateway→gesture-service" \
+    "http://localhost:8080/api/gestures" \
+    '{"sessionId":"smoke-session","gestureType":"PINCH","confidence":0.95}'
+
+  smoke_post "gesture-service (direct)" \
     "http://localhost:8082/api/gestures" \
     '{"sessionId":"smoke-session","gestureType":"PINCH","confidence":0.95}'
 

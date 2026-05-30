@@ -9,9 +9,10 @@ PID_FILE="$ROOT/scripts/.demo-pids"
 FRONTEND_DIR="$ROOT/frontend/web-client"
 FRONTEND_PORT=3000
 
-DEMO_PORTS=(8082 8083 8084 8085 8086 8087 8088 $FRONTEND_PORT)
+DEMO_PORTS=(8080 8082 8083 8084 8085 8086 8087 8088 $FRONTEND_PORT)
 
 declare -A SERVICES=(
+  [api-gateway]="backend/api-gateway"
   [gesture-service]="backend/gesture-service"
   [orchestrator-service]="backend/orchestrator-service"
   [session-service]="backend/session-service"
@@ -140,6 +141,13 @@ for svc in "${SERVICE_ORDER[@]}"; do
   wait_for_port "$svc" "${SERVICE_PORTS[$svc]}" || true
 done
 
+# ── api-gateway (start last, after upstreams are ready) ──────────────────────
+
+echo ""
+blue "→ Starting api-gateway on :8080..."
+start_service "api-gateway"
+wait_for_port "api-gateway" 8080 || true
+
 # ── frontend static server ────────────────────────────────────────────────────
 
 echo ""
@@ -168,6 +176,7 @@ green "=== Demo stack is UP ==="
 echo ""
 echo "  Frontend:     http://localhost:3000/src/html/index.html"
 echo "  Dashboard:    http://localhost:3000/src/html/dashboard.html"
+echo "  API Gateway:  http://localhost:8080/actuator/health"
 echo "  RabbitMQ UI:  http://localhost:15672  (guest / guest)"
 echo ""
 echo "  PID file:     $PID_FILE"
