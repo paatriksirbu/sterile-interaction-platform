@@ -15,6 +15,8 @@ public class RabbitConfig {
     public static final String EXCHANGE              = "surgical.events";
     public static final String COMMAND_QUEUE         = "notifier.interaction.command.queue";
     public static final String COMMAND_ROUTING_KEY   = "command.interaction";
+    public static final String ANNOTATION_QUEUE      = "notifier.annotation.queue";
+    public static final String ANNOTATION_ROUTING_KEY = "annotation.created";
 
     @Bean
     public TopicExchange surgicalExchange() {
@@ -29,6 +31,16 @@ public class RabbitConfig {
     @Bean
     public Binding commandBinding(Queue commandQueue, TopicExchange surgicalExchange) {
         return BindingBuilder.bind(commandQueue).to(surgicalExchange).with(COMMAND_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue annotationQueue() {
+        return QueueBuilder.durable(ANNOTATION_QUEUE).build();
+    }
+
+    @Bean
+    public Binding annotationBinding(Queue annotationQueue, TopicExchange surgicalExchange) {
+        return BindingBuilder.bind(annotationQueue).to(surgicalExchange).with(ANNOTATION_ROUTING_KEY);
     }
 
     @Bean

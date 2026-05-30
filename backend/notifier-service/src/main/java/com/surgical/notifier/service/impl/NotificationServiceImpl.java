@@ -1,5 +1,6 @@
 package com.surgical.notifier.service.impl;
 
+import com.example.shared.events.AnnotationCreatedEvent;
 import com.example.shared.events.InteractionCommandEvent;
 import com.surgical.notifier.dto.NotificationMessage;
 import com.surgical.notifier.service.NotificationService;
@@ -42,6 +43,19 @@ public class NotificationServiceImpl implements NotificationService {
                 notification.message(), notification.type(),
                 event.sessionId(), event.sourceGesture(), notification.id());
 
+        pushToFrontend(notification);
+    }
+
+    @Override
+    public void processAnnotation(AnnotationCreatedEvent event) {
+        NotificationMessage notification = NotificationMessage.of("INFO",
+            "Anotación creada: " + event.annotationText());
+        store.addFirst(notification);
+        if (store.size() > MAX_SIZE) {
+            store.pollLast();
+        }
+        log.info("[NOTIFIER][ANNOTATION] Stored notification: id={} session={} text='{}'",
+            notification.id(), event.sessionId(), event.annotationText());
         pushToFrontend(notification);
     }
 
