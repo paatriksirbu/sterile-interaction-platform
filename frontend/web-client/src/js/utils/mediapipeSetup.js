@@ -1,4 +1,4 @@
-import { CONFIG } from "/frontend/web-client/src/js/config.js";
+import { CONFIG } from "../config.js";
 
 export function initMediaPipe(videoElement, onResultsCallback) {
   const HandsCtor = window.Hands;

@@ -94,7 +94,7 @@ export function onResults(results) {
     gestureState = gestureDetector.detectAll(hands, handedness);
     // Usar las manos más prioritarias para las interacciones
     prioritizedHands = gestureState.prioritizedLandmarks || hands;
-    sendGestureIfConfirmed(gestureState);
+    sendGestureIfConfirmed(gestureState, 'index');
 
     // Update hand tracking HUD visualization
     updateHandTrackingHUD(hands, handedness, gestureState);

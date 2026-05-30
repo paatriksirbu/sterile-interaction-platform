@@ -1,6 +1,7 @@
 import { initMediaPipe } from "../utils/mediapipeSetup.js";
 import { gestureDetector } from "../gestures/detector.js";
 import { processDashboardGestures } from "./dashboard_gestures.js";
+import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 
 import { applyMirror, clearCanvas } from "../utils/canvas.js";
 import { drawAllHands } from "../rendering/hands.js";
@@ -198,6 +199,7 @@ function onResults(results) {
   if (hands.length) {
     // Pasar handedness para usar confianza en la priorización de manos
     const gestureState = gestureDetector.detectAll(hands, handedness);
+    sendGestureIfConfirmed(gestureState, 'dashboard');
 
     // Update hand tracking HUD visualization
     updateHandTrackingHUD(hands, handedness, gestureState);

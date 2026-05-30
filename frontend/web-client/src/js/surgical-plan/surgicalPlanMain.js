@@ -22,6 +22,7 @@ import {
 } from "./surgicalPlanGestures.js";
 
 import { speechService } from "../services/speechService.js";
+import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 import { CONFIG } from "../config.js";
 
 const state = {
@@ -628,6 +629,7 @@ function onResults(results) {
 
   // Pasar handedness para usar confianza en la priorización de manos
   const gestureState = gestureDetector.detectAll(hands, handedness);
+  sendGestureIfConfirmed(gestureState, 'surgical_plan');
 
   // Update hand tracking HUD visualization
   updateHandTrackingHUD(hands, handedness, gestureState);

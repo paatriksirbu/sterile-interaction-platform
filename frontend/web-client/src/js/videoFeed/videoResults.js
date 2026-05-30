@@ -6,6 +6,7 @@ import { drawAllHands } from "../rendering/hands.js";
 import { getThumbIndexPinchPositions } from "../gestures/pinch.js";
 import { processVideoGestures, processButtonHover } from "./videoGestures.js";
 import { isLockGestureActive } from "../gestures/lockGesture.js";
+import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 import { interactionState } from "../interactions/state.js";
 import {
   updateHandTrackingHUD,
@@ -40,6 +41,7 @@ export function onVideoResults(results) {
   let gestureState = null;
   if (hands.length > 0) {
     gestureState = gestureDetector.detectAll(hands, handedness);
+    sendGestureIfConfirmed(gestureState, 'live_feed');
 
     // Update hand tracking HUD visualization
     updateHandTrackingHUD(hands, handedness, gestureState);

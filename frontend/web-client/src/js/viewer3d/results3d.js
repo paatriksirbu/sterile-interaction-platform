@@ -8,6 +8,7 @@ import {
   processGestureFeedback,
 } from "../rendering/handTrackingHUD.js";
 import { gestureDetector } from "../gestures/detector.js";
+import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 
 let lastHands = [];
 let lastHandedness = [];
@@ -221,6 +222,7 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
 
   // Update hand tracking visualization
   const gestureState = gestureDetector.detectAll(hands, handedness);
+  sendGestureIfConfirmed(gestureState, 'viewer3d');
   updateHandTrackingHUD(hands, handedness, gestureState);
   processGestureFeedback(gestureState);
 

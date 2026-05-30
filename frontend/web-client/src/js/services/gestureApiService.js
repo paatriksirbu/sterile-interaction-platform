@@ -15,7 +15,7 @@ const GESTURE_MAP = {
 let _lastSentGesture = null;
 let _lastSentTs = 0;
 
-function sendGestureIfConfirmed(gestureState) {
+function sendGestureIfConfirmed(gestureState, pageName = 'unknown') {
   if (!gestureState) return;
 
   const priority = ['pinch', 'pointing', 'closedFist', 'openHand', 'lock', 'spherical'];
@@ -45,14 +45,14 @@ function sendGestureIfConfirmed(gestureState) {
     confidence: 1.0
   };
 
-  console.log('[GESTURE_API] Sending gesture:', JSON.stringify(payload));
+  console.log(`[GESTURE_API][${pageName}] Sending gesture:`, JSON.stringify(payload));
 
   fetch(GESTURE_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-    .then(function(res) { console.log('[GESTURE_API] Response:', res.status); })
+    .then(function(res) { console.log(`[GESTURE_API][${pageName}] Response:`, res.status); })
     .catch(function(err) { console.warn('[GESTURE_API] POST failed:', err.message); });
 }
 
