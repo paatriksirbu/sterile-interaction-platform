@@ -16,6 +16,8 @@ public class RabbitConfig {
     public static final String GESTURE_QUEUE      = "orchestrator.gesture.queue";
     public static final String GESTURE_ROUTING_KEY = "gesture.detected";
     public static final String COMMAND_ROUTING_KEY = "command.interaction";
+    public static final String TRANSCRIPTION_QUEUE = "orchestrator.transcription.queue";
+    public static final String TRANSCRIPTION_ROUTING_KEY = "transcription.completed";
 
     @Bean
     public TopicExchange surgicalExchange() {
@@ -30,6 +32,16 @@ public class RabbitConfig {
     @Bean
     public Binding gestureBinding(Queue gestureQueue, TopicExchange surgicalExchange) {
         return BindingBuilder.bind(gestureQueue).to(surgicalExchange).with(GESTURE_ROUTING_KEY);
+    }
+
+    @Bean
+    public Queue transcriptionQueue() {
+        return QueueBuilder.durable(TRANSCRIPTION_QUEUE).build();
+    }
+
+    @Bean
+    public Binding transcriptionBinding(Queue transcriptionQueue, TopicExchange surgicalExchange) {
+        return BindingBuilder.bind(transcriptionQueue).to(surgicalExchange).with(TRANSCRIPTION_ROUTING_KEY);
     }
 
     @Bean
