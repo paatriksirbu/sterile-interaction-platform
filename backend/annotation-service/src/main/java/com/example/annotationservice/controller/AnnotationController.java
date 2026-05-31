@@ -1,11 +1,15 @@
 package com.example.annotationservice.controller;
 
 import com.example.annotationservice.dto.AnnotationRequest;
+import com.example.annotationservice.entity.AnnotationEntity;
 import com.example.annotationservice.service.AnnotationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -27,5 +31,19 @@ public class AnnotationController {
             request.sessionId(), request.resourceId(), request.annotationText());
         annotationService.createAnnotation(request);
         return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AnnotationEntity>> getBySession(
+            @RequestParam String sessionId) {
+        List<AnnotationEntity> annotations = annotationService.findBySessionId(sessionId);
+        return ResponseEntity.ok(annotations);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AnnotationEntity> getById(@PathVariable UUID id) {
+        return annotationService.findById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 }

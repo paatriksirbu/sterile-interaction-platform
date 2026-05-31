@@ -14,3 +14,24 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: surgical-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: surgical_platform
+      POSTGRES_USER: surgical
+      POSTGRES_PASSWORD: surgical
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U surgical -d surgical_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  postgres_data:
