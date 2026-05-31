@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import java.util.UUID;
 
 @RestController
@@ -21,6 +23,11 @@ import java.util.UUID;
 public class SessionStateController {
 
     private final SessionStateService sessionStateService;
+
+    @GetMapping
+    public ResponseEntity<List<SessionContextDTO>> listSessions() {
+        return ResponseEntity.ok(sessionStateService.findAll());
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -39,8 +40,13 @@ public class SessionStateServiceImpl implements SessionStateService {
                 event.commandType(), event.sessionId(), event.originEventId());
 
         SessionState session = sessionStateRepository.findById(event.sessionId())
+                .map(s -> {
+                    log.info("[session-service] Session loaded from DB: sessionId={} status={} viewer={}",
+                            s.getSessionId(), s.getStatus(), s.getActiveViewer());
+                    return s;
+                })
                 .orElseGet(() -> {
-                    log.info("[SESSION] Unknown session, auto-creating: sessionId={}", event.sessionId());
+                    log.info("[session-service] Session not found, auto-creating: sessionId={}", event.sessionId());
                     return buildNewSession(event.sessionId());
                 });
 
@@ -54,6 +60,8 @@ public class SessionStateServiceImpl implements SessionStateService {
         applyCommandLogic(session, event.commandType());
         session.setLastUpdatedAt(Instant.now());
         sessionStateRepository.save(session);
+        log.info("[session-service] Session persisted to PostgreSQL: sessionId={} status={} viewer={} lastAction={}",
+                session.getSessionId(), session.getStatus(), session.getActiveViewer(), session.getLastAction());
 
         publishSessionChanged(session, event.commandType());
 
@@ -65,6 +73,12 @@ public class SessionStateServiceImpl implements SessionStateService {
     @Transactional(readOnly = true)
     public SessionContextDTO getSession(String sessionId) {
         return toDto(findOrThrow(sessionId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<SessionContextDTO> findAll() {
+        return sessionStateRepository.findAll().stream().map(this::toDto).toList();
     }
 
     @Override
@@ -171,8 +185,11 @@ public class SessionStateServiceImpl implements SessionStateService {
     }
 
     private SessionState findOrThrow(String sessionId) {
-        return sessionStateRepository.findById(sessionId)
+        SessionState s = sessionStateRepository.findById(sessionId)
                 .orElseThrow(() -> new SessionNotFoundException(sessionId));
+        log.info("[session-service] Session loaded from DB: sessionId={} status={} viewer={}",
+                s.getSessionId(), s.getStatus(), s.getActiveViewer());
+        return s;
     }
 
     private SessionState buildNewSession(String sessionId) {

@@ -7,9 +7,12 @@ import com.example.sessionservice.dto.ActionRequest;
 import com.example.shared.dto.SessionContextDTO;
 import com.example.shared.events.InteractionCommandEvent;
 
+import java.util.List;
+
 public interface SessionStateService {
     void handleCommand(InteractionCommandEvent event);
     SessionContextDTO getSession(String sessionId);
+    List<SessionContextDTO> findAll();
     SessionContextDTO createSession(String sessionId);
     SessionContextDTO patchSession(String sessionId, PatchSessionRequest request);
     SessionContextDTO updateViewer(String sessionId, UpdateViewerRequest request);

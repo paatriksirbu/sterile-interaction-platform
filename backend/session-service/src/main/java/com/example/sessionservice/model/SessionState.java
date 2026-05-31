@@ -16,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "session_state")
+@Table(name = "sessions")
 public class SessionState {
 
     @Id

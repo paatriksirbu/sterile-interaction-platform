@@ -38,10 +38,9 @@
             <groupId>com.surgical</groupId>
             <artifactId>surgical-shared-events</artifactId>
         </dependency>
-        <!-- H2 for development; swap for PostgreSQL driver in production -->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
