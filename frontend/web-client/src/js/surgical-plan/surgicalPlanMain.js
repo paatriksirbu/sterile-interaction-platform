@@ -23,7 +23,8 @@ import {
 
 import { speechService } from "../services/speechService.js";
 import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
-import { CONFIG } from "../config.js";
+import { CONFIG, API_BASE_URL } from "../config.js";
+import { getSessionId } from "../services/sessionContextService.js";
 
 const state = {
   currentStepIndex: 0,
@@ -493,113 +494,106 @@ function goBack() {
   window.location.href = "dashboard.html";
 }
 
-// ========== GRABACIÓN DE NOTAS DE VOZ ==========
-let recordingTimeout = null;
-const VOICE_NOTE_DURATION_MS = 10000; // 10 segundos de grabación máxima
+// ========== GRABACIÓN DE NOTAS DE VOZ (Web Speech API) ==========
 
-async function toggleVoiceRecording(micButton) {
+let _voiceRecognition = null;
+
+function _setVoiceUI(micButton, speechIndicator, label, active) {
+  micButton?.classList.toggle("recording", active);
+  speechIndicator?.classList.toggle("recording", active);
+  const el = speechIndicator?.querySelector(".speech-label");
+  if (el) el.textContent = label;
+}
+
+function _postToSpeechService(transcript) {
+  const payload = {
+    sessionId: getSessionId(),
+    recognizedText: transcript,
+    confidence: 0.95
+  };
+  fetch(API_BASE_URL + '/api/speech/transcriptions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(res => console.log('[SURGICAL_PLAN][VOICE] Sent transcription to speech-service:', res.status))
+    .catch(err => console.warn('[SURGICAL_PLAN][VOICE] speech-service POST failed:', err.message));
+}
+
+function toggleVoiceRecording(micButton) {
   const speechIndicator = document.getElementById("speech-indicator");
 
-  // Si ya se está grabando, detener
+  // Stop any in-progress recognition
   if (state.isRecording) {
-    await stopVoiceRecording(micButton, speechIndicator);
+    _voiceRecognition?.stop();
     return;
   }
 
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn('[SURGICAL_PLAN][VOICE] Web Speech API not available in this browser');
+    _setVoiceUI(micButton, speechIndicator, 'NOT AVAILABLE', false);
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = false;
+  _voiceRecognition = recognition;
+
   state.isRecording = true;
-  micButton?.classList.add("recording");
-  speechIndicator?.classList.add("recording");
+  _setVoiceUI(micButton, speechIndicator, 'RECORDING...', true);
+  console.log('[SURGICAL_PLAN][VOICE] Web Speech started');
 
-  const speechLabelEl = speechIndicator?.querySelector(".speech-label");
-  if (speechLabelEl) speechLabelEl.textContent = "RECORDING...";
-
-  if (!speechService.isConfigured) {
-    const key = CONFIG.AZURE_SPEECH?.SUBSCRIPTION_KEY;
-    const region = CONFIG.AZURE_SPEECH?.REGION;
-    if (key && region) {
-      speechService.configure(key, region);
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript.trim();
+    console.log('[SURGICAL_PLAN][VOICE] Transcript captured:', transcript);
+    if (transcript) {
+      addNote(transcript);
+      _postToSpeechService(transcript);
     } else {
-      console.warn("Azure Speech not configured, using simulation");
-      simulateVoiceRecording(micButton, speechIndicator);
-      return;
+      console.log('[SURGICAL_PLAN][VOICE] No speech detected');
+      _setVoiceUI(micButton, speechIndicator, 'SIN VOZ', false);
     }
-  }
+  };
 
-  try {
-    speechService.onInterimResult((text) => {
-      if (speechLabelEl)
-        speechLabelEl.textContent = text
-          ? `"${text.slice(0, 30)}..."`
-          : "LISTENING...";
-    });
-
-    await speechService.startListening();
-    console.log("🎤 Voice recording started");
-
-    // Configurar timeout para detener la grabacion
-    recordingTimeout = setTimeout(async () => {
-      if (state.isRecording) {
-        await stopVoiceRecording(micButton, speechIndicator);
-      }
-    }, VOICE_NOTE_DURATION_MS);
-  } catch (error) {
-    console.error("Failed to start voice recording:", error);
-    simulateVoiceRecording(micButton, speechIndicator);
-  }
-}
-
-async function stopVoiceRecording(micButton, speechIndicator) {
-  if (recordingTimeout) {
-    clearTimeout(recordingTimeout);
-    recordingTimeout = null;
-  }
-
-  state.isRecording = false;
-  micButton?.classList.remove("recording");
-  speechIndicator?.classList.remove("recording");
-
-  const speechLabelEl = speechIndicator?.querySelector(".speech-label");
-  if (speechLabelEl) speechLabelEl.textContent = "PROCESSING...";
-
-  try {
-    const transcribedText = await speechService.stopListening();
-
-    if (transcribedText && transcribedText.trim()) {
-      addNote(transcribedText.trim());
-      console.log("🎤 Voice note saved:", transcribedText);
+  recognition.onerror = function(event) {
+    if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+      console.error('[SURGICAL_PLAN][VOICE] Microphone permission denied');
+      _setVoiceUI(micButton, speechIndicator, 'MIC DENEGADO', false);
+    } else if (event.error === 'no-speech') {
+      console.log('[SURGICAL_PLAN][VOICE] No speech detected');
+      _setVoiceUI(micButton, speechIndicator, 'SIN VOZ', false);
     } else {
-      console.log("🎤 No speech detected");
+      console.warn('[SURGICAL_PLAN][VOICE] Speech error:', event.error);
+      _setVoiceUI(micButton, speechIndicator, 'ERROR VOZ', false);
     }
-  } catch (error) {
-    console.error("Error stopping recording:", error);
-  }
-
-  if (speechLabelEl) speechLabelEl.textContent = "VOICE READY";
-}
-
-function simulateVoiceRecording(micButton, speechIndicator) {
-  console.log("🎤 Using simulated voice recording");
-  const speechLabelEl = speechIndicator?.querySelector(".speech-label");
-
-  setTimeout(() => {
     state.isRecording = false;
+    _voiceRecognition = null;
+  };
+
+  recognition.onend = function() {
+    state.isRecording = false;
+    _voiceRecognition = null;
+    // Only reset label if it wasn't already set to an error/status message
+    const el = speechIndicator?.querySelector(".speech-label");
+    if (el && el.textContent === 'RECORDING...') {
+      el.textContent = 'VOICE READY';
+    }
     micButton?.classList.remove("recording");
     speechIndicator?.classList.remove("recording");
+  };
 
-    // Agregar una nota de ejemplo
-    const sampleNotes = [
-      "Patient shows good range of motion in pre-op assessment.",
-      "Verified implant size: 5mm tibial insert.",
-      "Noted slight swelling, recommend ice post-op.",
-      "Patient confirmed no allergies to latex.",
-      "Surgical site marked and verified.",
-    ];
-    const randomNote =
-      sampleNotes[Math.floor(Math.random() * sampleNotes.length)];
-    addNote(randomNote);
-
-    if (speechLabelEl) speechLabelEl.textContent = "VOICE READY";
-  }, 3000);
+  try {
+    recognition.start();
+  } catch (err) {
+    console.error('[SURGICAL_PLAN][VOICE] Failed to start Web Speech:', err);
+    state.isRecording = false;
+    _voiceRecognition = null;
+    _setVoiceUI(micButton, speechIndicator, 'VOICE READY', false);
+  }
 }
 
 function setupGestureCanvas() {

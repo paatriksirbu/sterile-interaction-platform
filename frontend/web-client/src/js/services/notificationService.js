@@ -65,7 +65,7 @@
   function connect() {
     var client = new StompJs.Client({
       webSocketFactory: function () {
-        return new SockJS('http://localhost:8085/ws-notifications');
+        return new SockJS('http://localhost:8080/ws-notifications');
       },
       reconnectDelay: 5000,
       onConnect: function () {

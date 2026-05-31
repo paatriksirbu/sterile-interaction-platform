@@ -1,6 +1,7 @@
 import { getSessionId } from './sessionContextService.js';
+import { API_BASE_URL } from '../config.js';
 
-const GESTURE_ENDPOINT = 'http://localhost:8082/api/gestures';
+const GESTURE_ENDPOINT = API_BASE_URL + '/api/gestures';
 const COOLDOWN_MS = 1000;
 
 const GESTURE_MAP = {

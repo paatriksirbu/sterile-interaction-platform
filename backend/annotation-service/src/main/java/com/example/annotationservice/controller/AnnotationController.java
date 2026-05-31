@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/annotations")
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AnnotationController {
 

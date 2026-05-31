@@ -1,9 +1,10 @@
 import { annotationManager } from '../objects/annotationManager.js';
 import { getSessionId } from './sessionContextService.js';
+import { API_BASE_URL } from '../config.js';
 
 const RESOURCE_ID = 'surgical-pdf-main';
 const VIEWER_TYPE = 'PDF';
-const ENDPOINT = 'http://localhost:8088/api/annotations';
+const ENDPOINT = API_BASE_URL + '/api/annotations';
 const SPEECH_TIMEOUT_MS = 5000;
 const FALLBACK_TEXT = 'Anotación creada por gesto';
 

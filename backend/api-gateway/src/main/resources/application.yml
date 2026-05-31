@@ -4,6 +4,12 @@ spring:
 
   cloud:
     gateway:
+      # ── Deduplicate CORS headers added by both gateway and downstream services ─
+      # SockJS (notifier-service) and the gateway both emit Access-Control-Allow-Origin.
+      # RETAIN_FIRST keeps the first occurrence and drops any duplicates.
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+
       # ── Global CORS ───────────────────────────────────────────────────────────
       globalcors:
         cors-configurations:
