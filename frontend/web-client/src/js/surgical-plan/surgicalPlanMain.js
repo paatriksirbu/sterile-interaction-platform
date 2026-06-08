@@ -21,7 +21,6 @@ import {
   setActionCallbacks,
 } from "./surgicalPlanGestures.js";
 
-import { speechService } from "../services/speechService.js";
 import { sendGestureIfConfirmed } from "../services/gestureApiService.js";
 import { CONFIG, API_BASE_URL } from "../config.js";
 import { getSessionId } from "../services/sessionContextService.js";
@@ -37,6 +36,8 @@ const state = {
   handsDetected: false,
 };
 
+const stepsScrollState = { active: false, lastY: null };
+
 const videoElement = document.querySelector(".input_video");
 const overlay = document.getElementById("overlay");
 const ctx = overlay?.getContext("2d");
@@ -44,10 +45,72 @@ const gestureCanvas = document.getElementById("gesture-canvas");
 const gestureCtx = gestureCanvas?.getContext("2d");
 const threeCanvas = document.getElementById("three-canvas");
 
-let scene, camera, renderer, model;
+let scene, camera, renderer, model, controls;
+let _THREE = null, _fbxLoader = null, _diffuseTexture = null, _normalTexture = null;
+
+async function loadKneeModel() {
+  if (!scene || !_THREE || !_fbxLoader) return;
+
+  if (model) {
+    scene.remove(model);
+    model = null;
+  }
+
+  try {
+    const fbxModel = await new Promise((resolve, reject) => {
+      _fbxLoader.load(
+        "../assets/knee/model.fbx",
+        (object) => resolve(object),
+        (progress) => {
+          const percent = (progress.loaded / progress.total) * 100;
+          console.log(`[SurgicalPlan] Loading model: ${percent.toFixed(1)}%`);
+        },
+        (error) => reject(error),
+      );
+    });
+
+    fbxModel.traverse((child) => {
+      if (child.isMesh) {
+        child.material = new _THREE.MeshStandardMaterial({
+          map: _diffuseTexture,
+          normalMap: _normalTexture,
+          roughness: 0.6,
+          metalness: 0.1,
+        });
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
+    const box = new _THREE.Box3().setFromObject(fbxModel);
+    const center = box.getCenter(new _THREE.Vector3());
+    const size = box.getSize(new _THREE.Vector3());
+
+    fbxModel.position.sub(center);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    fbxModel.scale.setScalar(3 / maxDim);
+    fbxModel.position.y -= 1.5;
+
+    model = fbxModel;
+    scene.add(model);
+
+    console.log("[SURGICAL_PLAN][MODEL] Model asset reloaded successfully");
+  } catch (error) {
+    console.error("[SURGICAL_PLAN][MODEL] Model reload failed:", error.message || error);
+
+    const placeholderGeom = new _THREE.SphereGeometry(1, 32, 32);
+    const placeholderMat = new _THREE.MeshStandardMaterial({
+      color: 0xe8dcc8,
+      roughness: 0.5,
+    });
+    model = new _THREE.Mesh(placeholderGeom, placeholderMat);
+    scene.add(model);
+  }
+}
 
 async function initThreeJS() {
   const THREE = await import("three");
+  _THREE = THREE;
   const { OrbitControls } =
     await import("three/addons/controls/OrbitControls.js");
   const { FBXLoader } = await import("three/addons/loaders/FBXLoader.js");
@@ -60,7 +123,6 @@ async function initThreeJS() {
   scene.background = new THREE.Color(0x050810);
 
   camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  // Posicion inicial
   camera.position.set(0, 0, 6);
   camera.up.set(0, 1, 0);
 
@@ -87,83 +149,20 @@ async function initThreeJS() {
   rimLight.position.set(0, 0, -5);
   scene.add(rimLight);
 
-  // Cargar texturas para el modelo de la rodilla
   const textureLoader = new THREE.TextureLoader();
-  const diffuseTexture = textureLoader.load(
-    "../assets/knee/tex_u1_v1_diffuse.jpg",
-  );
-  const normalTexture = textureLoader.load(
-    "../assets/knee/tex_u1_v1_normal.jpg",
-  );
+  _diffuseTexture = textureLoader.load("../assets/knee/tex_u1_v1_diffuse.jpg");
+  _normalTexture = textureLoader.load("../assets/knee/tex_u1_v1_normal.jpg");
+  _diffuseTexture.colorSpace = THREE.SRGBColorSpace;
 
-  // Configurar texturas
-  diffuseTexture.colorSpace = THREE.SRGBColorSpace;
+  _fbxLoader = new FBXLoader();
 
-  // Cargar modelo de la rodilla
-  const fbxLoader = new FBXLoader();
-
-  try {
-    const fbxModel = await new Promise((resolve, reject) => {
-      fbxLoader.load(
-        "../assets/knee/model.fbx",
-        (object) => resolve(object),
-        (progress) => {
-          const percent = (progress.loaded / progress.total) * 100;
-          console.log(`[SurgicalPlan] Loading model: ${percent.toFixed(1)}%`);
-        },
-        (error) => reject(error),
-      );
-    });
-
-    // Aplicar texturas a las mallas del modelo
-    fbxModel.traverse((child) => {
-      if (child.isMesh) {
-        child.material = new THREE.MeshStandardMaterial({
-          map: diffuseTexture,
-          normalMap: normalTexture,
-          roughness: 0.6,
-          metalness: 0.1,
-        });
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-
-    const box = new THREE.Box3().setFromObject(fbxModel);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-
-    // Centrar el modelo
-    fbxModel.position.sub(center);
-
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 3 / maxDim;
-    fbxModel.scale.setScalar(scale);
-
-    // Bajar el modelo en el eje Y
-    fbxModel.position.y -= 1.5;
-
-    model = fbxModel;
-    scene.add(model);
-
-    console.log("[SurgicalPlan] Knee model loaded successfully");
-  } catch (error) {
-    console.error("[SurgicalPlan] Error loading knee model:", error);
-
-    const placeholderGeom = new THREE.SphereGeometry(1, 32, 32);
-    const placeholderMat = new THREE.MeshStandardMaterial({
-      color: 0xe8dcc8,
-      roughness: 0.5,
-    });
-    model = new THREE.Mesh(placeholderGeom, placeholderMat);
-    scene.add(model);
-  }
+  await loadKneeModel();
 
   const gridHelper = new THREE.GridHelper(10, 20, 0x18b6ff, 0x0a1520);
   gridHelper.position.y = -2;
   scene.add(gridHelper);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
   controls.minDistance = 3;
@@ -201,10 +200,10 @@ function renderSteps() {
       <div class="step-content">
         <div class="step-title">${step.title}</div>
         <div class="step-detail">${step.detail}</div>
-        <div class="step-duration"><i class="fa-regular fa-clock"></i> ${step.duration}</div>
+        <div class="step-duration"><i class="fa-solid fa-clock"></i> ${step.duration}</div>
       </div>
       <div class="step-status">
-        ${step.completed ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-regular fa-circle"></i>'}
+        ${step.completed ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle"></i>'}
       </div>
     </div>
   `,
@@ -334,12 +333,12 @@ function renderModalNotes() {
     <div class="modal-note-item" data-note-id="${note.id}">
       <div class="modal-note-header">
         <div class="modal-note-time">
-          <i class="fa-regular fa-clock"></i>
+          <i class="fa-solid fa-clock"></i>
           ${note.time}
         </div>
         <div class="modal-note-actions">
           <button class="copy" title="Copy to clipboard" data-action="copy">
-            <i class="fa-regular fa-copy"></i>
+            <i class="fa-solid fa-copy"></i>
           </button>
           <button class="delete" title="Delete note" data-action="delete">
             <i class="fa-solid fa-trash"></i>
@@ -490,6 +489,29 @@ function adjustZoom(direction) {
   }
 }
 
+function resetModel() {
+  console.log('[SURGICAL_PLAN][MODEL] Reload requested');
+  if (!camera || !controls) return;
+
+  camera.position.set(0, 0, 6);
+  camera.up.set(0, 1, 0);
+  camera.lookAt(0, 0, 0);
+  controls.target.set(0, 0, 0);
+  controls.reset();
+
+  state.zoom = 1;
+  state.currentView = 'front';
+  updateZoomDisplay();
+  updateViewPresets('front');
+
+  console.log('[SURGICAL_PLAN][MODEL] Reset camera');
+
+  if (_fbxLoader && scene) {
+    console.log('[SURGICAL_PLAN][MODEL] Reloading current model asset...');
+    loadKneeModel();
+  }
+}
+
 function goBack() {
   window.location.href = "dashboard.html";
 }
@@ -600,15 +622,63 @@ function setupGestureCanvas() {
   if (!gestureCanvas || !gestureCtx) return;
 
   const dpr = window.devicePixelRatio || 1;
-  const cssW = 240;
-  const cssH = 140;
+  gestureCanvas.style.width = "240px";
+  gestureCanvas.style.height = "140px";
+  gestureCanvas.width = Math.round(240 * dpr);
+  gestureCanvas.height = Math.round(140 * dpr);
+}
 
-  gestureCanvas.style.width = cssW + "px";
-  gestureCanvas.style.height = cssH + "px";
-  gestureCanvas.width = Math.round(cssW * dpr);
-  gestureCanvas.height = Math.round(cssH * dpr);
-  gestureCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  applyMirror(gestureCtx, gestureCanvas, true);
+function processStepsHandScroll(hands, gestureState) {
+  const primaryHand = gestureState?.hands?.[0];
+  const openHand = primaryHand?.openHand?.detected;
+
+  if (!openHand || hands.length === 0) {
+    stepsScrollState.active = false;
+    stepsScrollState.lastY = null;
+    return;
+  }
+
+  const wrist = hands[0][0];
+  const screenX = (CONFIG.MIRROR ? 1 - wrist.x : wrist.x) * window.innerWidth;
+  const screenY = wrist.y * window.innerHeight;
+
+  const stepsPanel = document.querySelector(".steps-panel");
+  if (!stepsPanel) {
+    stepsScrollState.active = false;
+    stepsScrollState.lastY = null;
+    return;
+  }
+
+  const rect = stepsPanel.getBoundingClientRect();
+  const overPanel =
+    screenX >= rect.left &&
+    screenX <= rect.right &&
+    screenY >= rect.top &&
+    screenY <= rect.bottom;
+
+  if (!overPanel) {
+    stepsScrollState.active = false;
+    stepsScrollState.lastY = null;
+    return;
+  }
+
+  if (!stepsScrollState.active) {
+    console.log("[SURGICAL_PLAN][SCROLL] Hand scroll active");
+    stepsScrollState.active = true;
+    stepsScrollState.lastY = wrist.y;
+    return;
+  }
+
+  const deltaY = wrist.y - stepsScrollState.lastY;
+  stepsScrollState.lastY = wrist.y;
+
+  if (Math.abs(deltaY) < 0.012) return;
+
+  const stepsListEl = document.getElementById("steps-list");
+  if (stepsListEl) {
+    stepsListEl.scrollTop += deltaY * 1400;
+    console.log(`[SURGICAL_PLAN][SCROLL] deltaY=${deltaY.toFixed(4)}`);
+  }
 }
 
 function onResults(results) {
@@ -624,6 +694,8 @@ function onResults(results) {
   // Pasar handedness para usar confianza en la priorización de manos
   const gestureState = gestureDetector.detectAll(hands, handedness);
   sendGestureIfConfirmed(gestureState, 'surgical_plan');
+
+  processStepsHandScroll(hands, gestureState);
 
   // Update hand tracking HUD visualization
   updateHandTrackingHUD(hands, handedness, gestureState);
@@ -676,19 +748,14 @@ function onResults(results) {
   }
 
   if (gestureCanvas && gestureCtx) {
-    gestureCtx.save();
     gestureCtx.setTransform(1, 0, 0, 1, 0, 0);
     gestureCtx.clearRect(0, 0, gestureCanvas.width, gestureCanvas.height);
-    gestureCtx.restore();
 
     if (hands.length > 0) {
-      drawAllHands(gestureCtx, hands, handedness, {
-        width: 240,
-        height: 140,
-        showMesh: true,
-        dotSize: 3,
-        lineWidth: 1.5,
-      });
+      gestureCtx.save();
+      applyMirror(gestureCtx, gestureCanvas, true);
+      drawAllHands(gestureCtx, hands, handedness, gestureCanvas);
+      gestureCtx.restore();
     }
   }
 
@@ -711,6 +778,7 @@ async function init() {
     onMicToggle: (element) => toggleVoiceRecording(element),
     onExpandNotes: openNotesModal,
     onCloseModal: closeNotesModal,
+    onModelReset: resetModel,
   });
 
   renderSteps();
@@ -798,7 +866,7 @@ function setupClickHandlers() {
 
   document
     .getElementById("btn-reset-view")
-    ?.addEventListener("click", () => setViewPreset("front"));
+    ?.addEventListener("click", resetModel);
 
   document.getElementById("btn-record")?.addEventListener("click", (e) => {
     const micBtn = e.target.closest(".mic-btn");
@@ -842,7 +910,7 @@ function setupClickHandlers() {
         copyNoteToClipboard(noteId);
         actionBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
         setTimeout(() => {
-          actionBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+          actionBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
         }, 1000);
       }
     });
@@ -852,6 +920,18 @@ function setupClickHandlers() {
     if (e.key === "Escape") {
       closeNotesModal();
     }
+  });
+
+  // Camera watchdog UI feedback
+  document.addEventListener("hand-tracking:restarting", () => {
+    const el = document.getElementById("hand-status-text");
+    if (el) el.textContent = "Reconnecting...";
+    const latEl = document.getElementById("latency");
+    if (latEl) latEl.textContent = "—";
+  });
+  document.addEventListener("hand-tracking:restarted", () => {
+    const el = document.getElementById("hand-status-text");
+    if (el) el.textContent = "No Hand";
   });
 }
 

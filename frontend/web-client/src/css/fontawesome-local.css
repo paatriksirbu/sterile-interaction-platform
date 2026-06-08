@@ -20,6 +20,19 @@
   line-height: 1;
 }
 
+.fa-regular,
+.far {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  line-height: 1;
+}
+
 
 /* Icon definitions used in this project */
 .fa-hand::before {
@@ -414,6 +427,33 @@
 }
 .fa-grip-vertical::before {
   content: "\f58e";
+}
+.fa-circle-check::before {
+  content: "\f058";
+}
+.fa-list-check::before {
+  content: "\e1b5";
+}
+.fa-chart-simple::before {
+  content: "\e473";
+}
+.fa-clipboard-check::before {
+  content: "\f46c";
+}
+.fa-file-audio::before {
+  content: "\f1c7";
+}
+.fa-file-lines::before {
+  content: "\f15c";
+}
+.fa-id-card::before {
+  content: "\f2c2";
+}
+.fa-droplet::before {
+  content: "\f043";
+}
+.fa-border-all::before {
+  content: "\f84c";
 }
 
 

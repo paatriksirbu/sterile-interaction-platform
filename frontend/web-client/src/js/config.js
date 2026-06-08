@@ -174,8 +174,8 @@ export const CONFIG = {
     // Resolución de la cámara (más baja = más rápido, pero menos preciso a distancia)
     CAMERA_WIDTH: 480,
     CAMERA_HEIGHT: 360,
-    MIN_DETECTION_CONFIDENCE: 0.6,
-    MIN_TRACKING_CONFIDENCE: 0.6,
+    MIN_DETECTION_CONFIDENCE: 0.5,
+    MIN_TRACKING_CONFIDENCE: 0.5,
     HUD_UPDATE_INTERVAL: 3,
     STABILITY_UPDATE_INTERVAL: 2,
   },

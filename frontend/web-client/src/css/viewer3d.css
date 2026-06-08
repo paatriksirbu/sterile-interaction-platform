@@ -1,396 +1,424 @@
 :root {
-  --bg0: #05080a;
-  --bg1: #000;
-  --line: rgba(120, 200, 255, 0.16);
-  --line2: rgba(120, 200, 255, 0.08);
-  --txt: #cfefff;
-  --muted: rgba(207, 239, 255, 0.75);
-  --accent: #18b6ff;
-  --accent2: #0a8bd6;
-  --glass: rgba(0, 0, 0, 0.45);
+    --bg0: #05080a;
+    --bg1: #000;
+    --line: rgba(120, 200, 255, 0.16);
+    --line2: rgba(120, 200, 255, 0.08);
+    --txt: #cfefff;
+    --muted: rgba(207, 239, 255, 0.75);
+    --accent: #18b6ff;
+    --accent2: #0a8bd6;
+    --glass: rgba(0, 0, 0, 0.45);
 }
 
-
 body.mediscan {
-  margin: 0;
-  color: var(--txt);
-  font-family:
-    system-ui,
+    margin: 0;
+    padding: 0;
+    color: var(--txt);
+    font-family: system-ui,
     -apple-system,
     Segoe UI,
     Roboto,
     Arial,
     sans-serif;
-  background:
-    radial-gradient(1200px 600px at 50% 35%, rgba(24, 182, 255, 0.12), transparent 60%),
+    background: radial-gradient(1200px 600px at 50% 35%, rgba(24, 182, 255, 0.12), transparent 60%),
     radial-gradient(900px 500px at 50% 80%, rgba(24, 182, 255, 0.06), transparent 60%),
     radial-gradient(circle at 50% 50%, var(--bg0), var(--bg1));
-  height: 100vh;
-  overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
+/* ROOT WRAPPER — igual que surgical_plan */
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 12px 40px;
+    gap: 12px;
+    overflow: hidden;
+}
 
 /* TOPBAR */
 .topbar {
-  height: 70px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 0 18px;
-  border-bottom: 1px solid var(--line);
-  background: linear-gradient(to bottom, rgba(10, 14, 18, 0.9), rgba(0, 0, 0, 0.65));
+    position: relative;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: linear-gradient(to bottom, rgba(10, 14, 18, 0.9), rgba(0, 0, 0, 0.65));
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 1600px;
 }
-
 
 .btn-back {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--txt);
-  cursor: pointer;
-}
-.btn-back .icon {
-  font-size: 16px;
-  opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--txt);
+    cursor: pointer;
 }
 
+.btn-back .icon {
+    font-size: 16px;
+    opacity: 0.9;
+}
 
 .titleblock {
-  flex: 1;
-  padding-left: 8px;
-  border-left: 1px solid var(--line2);
-}
-.title {
-  letter-spacing: 0.08em;
-  font-weight: 700;
-  font-size: 12px;
-  color: #7fdcff;
-}
-.subtitle {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 3px;
+    flex: 1;
+    padding-left: 8px;
+    border-left: 1px solid var(--line2);
 }
 
+.title {
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 12px;
+    color: #7fdcff;
+}
+
+.subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+}
 
 .statusblock {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(60, 255, 150, 0.25);
-  background: rgba(0, 70, 35, 0.35);
-  font-size: 11px;
-  color: #bfffe0;
-}
-.pill .dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #2dff8a;
-  box-shadow: 0 0 10px rgba(45, 255, 138, 0.55);
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(60, 255, 150, 0.25);
+    background: rgba(0, 70, 35, 0.35);
+    font-size: 11px;
+    color: #bfffe0;
+}
+
+.pill .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2dff8a;
+    box-shadow: 0 0 10px rgba(45, 255, 138, 0.55);
+}
 
 .userchip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 12px;
-  border-left: 1px solid var(--line2);
-}
-.usertext .small {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.55);
-}
-.usertext .name {
-  font-size: 12px;
-  color: var(--txt);
-}
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    rgba(255, 255, 255, 0.35),
-    rgba(24, 182, 255, 0.35)
-  );
-  border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 12px;
+    border-left: 1px solid var(--line2);
 }
 
+.usertext .small {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.usertext .name {
+    font-size: 12px;
+    color: var(--txt);
+}
+
+.avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(
+            circle at 35% 30%,
+            rgba(255, 255, 255, 0.35),
+            rgba(24, 182, 255, 0.35)
+    );
+    border: 1px solid var(--line);
+}
 
 /* WORKAREA LAYOUT */
 .workarea {
-  position: relative;
-  height: calc(100vh - 70px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    flex: 1;
+    width: 100%;
+    max-width: 1600px;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-
-/* 1) El workarea ocupa todo el viewport menos la topbar */
-.workarea.fullscreenStage{
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 70px); /* 70px = tu topbar */
-  margin: 0;
-  overflow: hidden;
-  background: radial-gradient(#05080a, #000);
+/* 1) El workarea ocupa todo el espacio restante dentro del .root */
+.workarea.fullscreenStage {
+    position: relative;
+    width: 100%;
+    max-width: 1600px;
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: radial-gradient(#05080a, #000);
 }
-
 
 /* 2) Los canvases ocupan TODO el workarea */
 .workarea.fullscreenStage #three-canvas,
-.workarea.fullscreenStage #overlay{
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent;
-  display:block;
+.workarea.fullscreenStage #overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent;
+    display: block;
 }
-
 
 /* ✅ 3) Capas explícitas (esto evita bugs de clicks/stacking) */
-.workarea.fullscreenStage #three-canvas{ z-index: 10; }
-.workarea.fullscreenStage #overlay{
-  z-index: 20;
-  pointer-events: none; /* NO bloquea clicks */
+.workarea.fullscreenStage #three-canvas {
+    z-index: 10;
 }
 
+.workarea.fullscreenStage #overlay {
+    z-index: 20;
+    pointer-events: none; /* NO bloquea clicks */
+}
 
 /* (Compat) Por si el overlay existiese fuera de fullscreenStage */
-#overlay{ pointer-events:none; }
-
-
-/* (El frame antiguo ya no aplica; lo dejamos neutralizado) */
-.viewerFrame{
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
+#overlay {
+    pointer-events: none;
 }
 
+/* (El frame antiguo ya no aplica; lo dejamos neutralizado) */
+.viewerFrame {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
 
 /* Navegación circular */
 .navCircle {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(0,0,0,.35);
-  color: rgba(255,255,255,.65);
-  font-size:30px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: transform .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .35);
+    color: rgba(255, 255, 255, .65);
+    font-size: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .15s ease, border-color .15s ease, color .15s ease, background .15s ease;
 
-
-  /* ✅ MUY IMPORTANTE */
-  z-index: 60;          /* por encima de canvases */
-  pointer-events: auto; /* garantiza click aunque haya overlays */
+    /* ✅ MUY IMPORTANTE */
+    z-index: 60; /* por encima de canvases */
+    pointer-events: auto; /* garantiza click aunque haya overlays */
 }
 
-
-.navCircle:hover{
-  transform: translateY(-50%) scale(1.05);
-  border-color: rgba(127, 220, 255, 0.28);
-  color: rgba(127, 220, 255, 0.9);
-  background: rgba(0, 0, 0, 0.45);
+.navCircle:hover {
+    transform: translateY(-50%) scale(1.05);
+    border-color: rgba(127, 220, 255, 0.28);
+    color: rgba(127, 220, 255, 0.9);
+    background: rgba(0, 0, 0, 0.45);
 }
-.navLeft{ left:40px; }
-.navRight{ right:40px; }
 
+.navLeft {
+    left: 40px;
+}
+
+.navRight {
+    right: 40px;
+}
 
 /* ✅ (Opcional) etiqueta del modelo actual */
-.modelLabel{
-  position:absolute;
-  top:14px;
-  left:50%;
-  transform: translateX(-50%);
-  z-index: 60;
-  color: rgba(255,255,255,.85);
-  font-size:12px;
-  letter-spacing:.06em;
-  text-shadow: 0 1px 10px rgba(0,0,0,.6);
-  pointer-events:none;
+.modelLabel {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 60;
+    color: rgba(255, 255, 255, .85);
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, .6);
+    pointer-events: none;
 }
-
 
 /* Bottom left panel */
 .bottomLeft {
-  position: absolute;
-  left: 42px;
-  bottom: 28px;
-  width: 460px;
-  max-width: calc(100vw - 340px);
+    position: absolute;
+    left: 42px;
+    bottom: 100px;
+    width: 460px;
+    max-width: calc(100vw - 340px);
 
-
-  /* ✅ por encima de canvas */
-  z-index: 60;
-  pointer-events: auto;
+    /* ✅ por encima de canvas */
+    z-index: 60;
+    pointer-events: auto;
 }
-
 
 .hintRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 11px;
-  letter-spacing: 0.05em;
-  margin-bottom: 10px;
-}
-.hintIcon {
-  filter: grayscale(1);
-  opacity: 0.8;
-}
-.zoomValue {
-  margin-left: auto;
-  color: #7fdcff;
-  font-weight: 700;
-  font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
 }
 
+.hintIcon {
+    filter: grayscale(1);
+    opacity: 0.8;
+}
+
+.zoomValue {
+    margin-left: auto;
+    color: #7fdcff;
+    font-weight: 700;
+    font-size: 12px;
+}
 
 .zoomPanel {
-  background: rgba(0, 0, 0, 0.42);
-  border: 1px solid rgba(127, 220, 255, 0.14);
-  border-radius: 12px;
-  padding: 14px 14px 10px 14px;
-  box-shadow: 0 0 30px rgba(24, 182, 255, 0.06);
+    background: rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(127, 220, 255, 0.14);
+    border-radius: 12px;
+    padding: 14px 14px 10px 14px;
+    box-shadow: 0 0 30px rgba(24, 182, 255, 0.06);
 }
-
 
 .zoomSlider {
-  width: 100%;
-  appearance: none;
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(24, 182, 255, 0.95), rgba(24, 182, 255, 0.15));
-  outline: none;
-}
-.zoomSlider::-webkit-slider-thumb {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid rgba(24, 182, 255, 0.9);
-  box-shadow: 0 0 18px rgba(24, 182, 255, 0.45);
-}
-.minmax {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.45);
-}
-.zoomButtons {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-.miniBtn {
-  width: 42px;
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid rgba(127, 220, 255, 0.2);
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--txt);
-  cursor: pointer;
+    width: 100%;
+    appearance: none;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(24, 182, 255, 0.95), rgba(24, 182, 255, 0.15));
+    outline: none;
 }
 
+.zoomSlider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid rgba(24, 182, 255, 0.9);
+    box-shadow: 0 0 18px rgba(24, 182, 255, 0.45);
+}
+
+.minmax {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.zoomButtons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.miniBtn {
+    width: 42px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(127, 220, 255, 0.2);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--txt);
+    cursor: pointer;
+}
 
 /* Bottom right: depth */
-.bottomRight{
-  position:absolute;
-  right:42px;
-  bottom:28px;
+.bottomRight {
+    position: absolute;
+    right: 42px;
+    bottom: 100px;
 
-
-  /* ✅ por encima de canvas */
-  z-index: 60;
-  pointer-events: auto;
+    /* ✅ por encima de canvas */
+    z-index: 60;
+    pointer-events: auto;
 }
+
 .depthCard {
-  width: 260px;
-  height: 160px;
-  border-radius: 12px;
-  border: 1px solid rgba(127, 220, 255, 0.18);
-  background: rgba(0, 0, 0, 0.42);
-  box-shadow: 0 0 40px rgba(24, 182, 255, 0.08);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-#depthCanvas {
-  width: 100%;
-  height: 110px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(127, 220, 255, 0.1);
-}
-.depthLabel {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: rgba(127, 220, 255, 0.85);
-  text-align: center;
+    width: 260px;
+    height: 160px;
+    border-radius: 12px;
+    border: 1px solid rgba(127, 220, 255, 0.18);
+    background: rgba(0, 0, 0, 0.42);
+    box-shadow: 0 0 40px rgba(24, 182, 255, 0.08);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
+#depthCanvas {
+    width: 100%;
+    height: 150px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(127, 220, 255, 0.1);
+}
+
+.depthLabel {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: rgba(127, 220, 255, 0.85);
+    text-align: center;
+}
 
 /* Info panel (si lo usas) */
-.info-panel{
-  position:absolute;
-  top:14px;
-  left:14px;
-  background: rgba(0,0,0,.40);
-  border:1px solid rgba(127,220,255,.14);
-  border-radius:12px;
-  padding:10px 12px;
-  font-size:12px;
-  max-width:260px;
+.info-panel {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: rgba(0, 0, 0, .40);
+    border: 1px solid rgba(127, 220, 255, .14);
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 12px;
+    max-width: 260px;
 
-
-  /* ✅ por encima de canvas */
-  z-index: 60;
-  pointer-events: auto;
+    /* ✅ por encima de canvas */
+    z-index: 60;
+    pointer-events: auto;
 }
-
 
 /* Responsive: reduce panel sizes */
 @media (max-width: 900px) {
-  .bottomRight {
-    display: none;
-  }
-  .bottomLeft {
-    max-width: calc(100vw - 84px);
-  }
-  .navLeft {
-    left: 14px;
-  }
-  .navRight {
-    right: 14px;
-  }
-}
+    .bottomRight {
+        display: none;
+    }
 
+    .bottomLeft {
+        max-width: calc(100vw - 84px);
+    }
+
+    .navLeft {
+        left: 14px;
+    }
+
+    .navRight {
+        right: 14px;
+    }
+}

@@ -1,381 +1,371 @@
 /* Root layout */
 html,
 body {
-  margin: 0;
-  padding: 0;
-  background: #02060c;
-  color: #dce7ff;
-  font-family:
-    system-ui,
+    margin: 0;
+    padding: 0;
+    background: #02060c;
+    color: #dce7ff;
+    font-family: system-ui,
     Segoe UI,
     Roboto,
     Arial,
     sans-serif;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-}
-.root {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  box-sizing: border-box;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
+.root {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    box-sizing: border-box;
+}
 
 /* ========== HEADER ========== */
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: #040a12;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: #040a12;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
 }
-
 
 .brand-icon {
-  width: 42px;
-  height: 42px;
-  background: #0b2a45;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: #72b6ff;
-}
-.title h1 {
-  margin: 0;
-  font-size: 20px;
-}
-.title span {
-  font-size: 12px;
-  opacity: 0.6;
+    width: 42px;
+    height: 42px;
+    background: #0b2a45;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #72b6ff;
 }
 
+.title h1 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.title span {
+    font-size: 12px;
+    opacity: 0.6;
+}
 
 .status-right {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.gesture-state .label {
-  font-size: 11px;
-  opacity: 0.7;
-}
-.gesture-state .value.ok {
-  color: #58bfff;
-  font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
+.gesture-state .label {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.gesture-state .value.ok {
+    color: #58bfff;
+    font-weight: 600;
+}
 
 .user-icons {
-  display: flex;
-  gap: 10px;
-}
-.user-icons .icon,
-.avatar {
-  width: 34px;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #09121d;
-  border-radius: 8px;
-  cursor: pointer;
+    display: flex;
+    gap: 10px;
 }
 
+.user-icons .icon,
+.avatar {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #09121d;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
 /* ========== PATIENT CARD ========== */
 .patient-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #050b13;
-  padding: 14px 18px;
-  border-radius: 12px;
-  flex-shrink: 0;
-}
-.patient-card .tag {
-  background: #0a2e52;
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  margin: 6px 0;
-}
-.patient-card .sub {
-  font-size: 12px;
-  opacity: 0.7;
-}
-.small-label {
-  font-size: 12px;
-  opacity: 0.6;
-}
-.timer {
-  font-size: 22px;
-  margin-top: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #050b13;
+    padding: 14px 18px;
+    border-radius: 12px;
+    flex-shrink: 0;
 }
 
+.patient-card .tag {
+    background: #0a2e52;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin: 6px 0;
+}
+
+.patient-card .sub {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.small-label {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.timer {
+    font-size: 22px;
+    margin-top: 4px;
+}
 
 /* ========== MAIN GRID ========== */
 .main {
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 12px;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
-
 
 /* Tiles */
 .tiles {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 1fr 1fr;
-  gap: 12px;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
+
 .tile {
-  background: #070d16;
-  border-radius: 12px;
-  padding: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  cursor: pointer;
-  transition: 0.18s;
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
-  max-height: 100%;
-  display: flex;
-  flex-direction: column;
+    background: #070d16;
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    transition: 0.18s;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
+
 .tile:hover,
 .tile.hover {
-  border-color: #2496ff;
-  box-shadow: 0 0 0 2px #2496ff55;
-}
-.tile-icon {
-  font-size: 28px;
-  margin-bottom: 16px;
-  color: #58aaff;
+    border-color: #2496ff;
+    box-shadow: 0 0 0 2px #2496ff55;
 }
 
+.tile-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+    color: #58aaff;
+}
 
 .live {
-  background: repeating-linear-gradient(135deg, #071523 0, #071523 4px, #05101c 4px, #05101c 6px);
+    background: repeating-linear-gradient(135deg, #071523 0, #071523 4px, #05101c 4px, #05101c 6px);
 }
+
 .live-badge {
-  background: #ff4444;
-  color: #111;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  margin-left: 10px;
+    background: #ff4444;
+    color: #111;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-left: 10px;
 }
+
 /* =========================
     Hand monitor panel canvas
     ========================= */
 #gestureSketch {
-  width: 240px;
-  height: 150px;
-  display: block;
+    width: 240px;
+    height: 150px;
+    display: block;
 
-
-  border-radius: 10px;
-  background: radial-gradient(circle at center, rgba(88, 170, 255, 0.08), rgba(0, 0, 0, 0.55));
-  border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    background: radial-gradient(circle at center, rgba(88, 170, 255, 0.08), rgba(0, 0, 0, 0.55));
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
-
 
 /* ========== SIDEBAR ========== */
 .side {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
 }
-
 
 .panel {
-  background: #080f19;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  min-height: 0;
-  overflow: hidden;
+    background: #080f19;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    min-height: 0;
+    overflow: hidden;
 }
-
 
 .panel.gesture-monitor {
-  flex-shrink: 0;
+    flex-shrink: 0;
 }
-
 
 .panel.vitals {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-.panel-title {
-  font-size: 13px;
-  opacity: 0.7;
-}
-.latency {
-  font-size: 12px;
-  opacity: 0.6;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
+.panel-title {
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.latency {
+    font-size: 12px;
+    opacity: 0.6;
+}
 
 .gray-btn {
-  background: #0e1a2a;
-  color: #8ebcff;
-  border: 1px solid #133456;
-  padding: 8px 14px;
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  cursor: pointer;
+    background: #0e1a2a;
+    color: #8ebcff;
+    border: 1px solid #133456;
+    padding: 8px 14px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    cursor: pointer;
 }
-
 
 .blue-btn {
-  background: #0a60ff;
-  color: #fff;
-  padding: 10px 14px;
-  width: 100%;
-  margin-top: 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+    background: #0a60ff;
+    color: #fff;
+    padding: 10px 14px;
+    width: 100%;
+    margin-top: 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
 }
-
 
 /* ========== FOOTER HINTS ========== */
 .footer-hints {
-  opacity: 0.7;
-  display: flex;
-  gap: 20px;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-.footer-hints .right {
-  margin-left: auto;
-  opacity: 0.5;
+    opacity: 0.7;
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    flex-shrink: 0;
 }
 
+.footer-hints .right {
+    margin-left: auto;
+    opacity: 0.5;
+}
 
 /* === Pinch Cursor (visible cuando hay mano) === */
 /* ==============================
     ouchless Cursor + Dwell (300ms)
    ============================== */
 
-
 #pinch-cursor {
-  position: fixed;
-  left: -9999px;
-  top: -9999px;
+    position: fixed;
+    left: -9999px;
+    top: -9999px;
 
+    width: 64px;
+    height: 64px;
 
-  width: 64px;
-  height: 64px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 999999;
 
-
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 999999;
-
-
-  opacity: 0;
-  transition:
-    opacity 0.15s ease,
+    opacity: 0;
+    transition: opacity 0.15s ease,
     transform 0.06s linear,
     filter 0.12s ease;
-  filter: drop-shadow(0 0 10px rgba(19, 127, 236, 0.35));
+    filter: drop-shadow(0 0 10px rgba(19, 127, 236, 0.35));
 
-
-  /* progreso 0..1 (lo setea JS) */
-  --p: 0;
+    /* progreso 0..1 (lo setea JS) */
+    --p: 0;
 }
-
 
 #pinch-cursor.show {
-  opacity: 1;
+    opacity: 1;
 }
-
 
 /* Anillo dashed (como tu doc reader) */
 #pinch-cursor .ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  border: 2px dashed #137fec;
-  opacity: 0.85;
-  animation: pinch-spin 8s linear infinite;
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border: 2px dashed #137fec;
+    opacity: 0.85;
+    animation: pinch-spin 8s linear infinite;
 }
-
 
 /* ✅ Relleno/progreso (aparece cuando empieza el pinch y se “rellena” en 300ms) */
 #pinch-cursor .fill {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
 
+    /* Conic gradient = progreso circular */
+    background: conic-gradient(#137fec calc(var(--p) * 360deg), rgba(19, 127, 236, 0.1) 0);
 
-  /* Conic gradient = progreso circular */
-  background: conic-gradient(#137fec calc(var(--p) * 360deg), rgba(19, 127, 236, 0.1) 0);
+    /* Lo convertimos en “anillo” (donut) */
+    -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%);
+    mask: radial-gradient(circle, transparent 62%, #000 64%);
 
-
-  /* Lo convertimos en “anillo” (donut) */
-  -webkit-mask: radial-gradient(circle, transparent 62%, #000 64%);
-  mask: radial-gradient(circle, transparent 62%, #000 64%);
-
-
-  opacity: 0;
-  transition: opacity 0.12s ease;
+    opacity: 0;
+    transition: opacity 0.12s ease;
 }
-
 
 /* Solo se ve el relleno cuando estamos “armando” el pinch */
 #pinch-cursor.arming .fill {
-  opacity: 1;
+    opacity: 1;
 }
 
-
 /* Punto central */
-#pinch-cursor .dot k
-
+#pinch-cursor .dot {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 999px;
+    background: #137fec;
+    box-shadow: 0 0 10px #137fec;
+}
 
 /* Estado confirmed (cuando llega a 300ms) */
 #pinch-cursor.confirmed {
-  transform: translate(-50%, -50%) scale(1.08);
-  filter: drop-shadow(0 0 14px rgba(19, 127, 236, 0.7));
+    transform: translate(-50%, -50%) scale(1.08);
+    filter: drop-shadow(0 0 14px rgba(19, 127, 236, 0.7));
 }
-
 
 /* Animación ring */
 @keyframes pinch-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
-
-
-
-
 

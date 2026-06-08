@@ -6,6 +6,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +30,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding commandBinding(Queue commandQueue, TopicExchange surgicalExchange) {
+    public Binding commandBinding(@Qualifier("commandQueue") Queue commandQueue, TopicExchange surgicalExchange) {
         return BindingBuilder.bind(commandQueue).to(surgicalExchange).with(COMMAND_ROUTING_KEY);
     }
 
@@ -39,7 +40,7 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Binding annotationBinding(Queue annotationQueue, TopicExchange surgicalExchange) {
+    public Binding annotationBinding(@Qualifier("annotationQueue") Queue annotationQueue, TopicExchange surgicalExchange) {
         return BindingBuilder.bind(annotationQueue).to(surgicalExchange).with(ANNOTATION_ROUTING_KEY);
     }
 
