@@ -31,7 +31,6 @@ function getThumbIndexMidpoint(handLandmarks) {
 }
 
 const DWELL_MS = 300;
-const RESET_DWELL_MS = 1500;
 let dwellStart = null;
 let prevDwellConfirmed = false;
 
@@ -75,7 +74,6 @@ let actionCallbacks = {
   onMicToggle: null,
   onExpandNotes: null,
   onCloseModal: null,
-  onModelReset: null,
 };
 
 export function setActionCallbacks(callbacks) {
@@ -158,10 +156,8 @@ export function processSurgicalPlanGestures(hands, gestureState) {
       if (!dwellStart) {
         dwellStart = Date.now();
       } else {
-        const isResetBtn = interactiveTarget.id === 'btn-reset-view';
-        const effectiveDwell = isResetBtn ? RESET_DWELL_MS : DWELL_MS;
         const elapsed = Date.now() - dwellStart;
-        const progress = Math.min(1, elapsed / effectiveDwell);
+        const progress = Math.min(1, elapsed / DWELL_MS);
         showCursor(scrX, scrY, {
           arming: true,
           progress,
@@ -208,7 +204,7 @@ function triggerAction(element) {
     actionCallbacks.onZoom?.(isZoomIn ? "in" : "out");
   } else if (element.classList.contains("ctrl-btn")) {
     if (element.id === "btn-reset-view")
-      actionCallbacks.onModelReset?.();
+      actionCallbacks.onViewPresetSelect?.("front");
     else if (element.id === "btn-toggle-wireframe")
       element.classList.toggle("active");
     else if (element.id === "btn-toggle-labels")

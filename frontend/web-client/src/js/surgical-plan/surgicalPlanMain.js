@@ -46,71 +46,9 @@ const gestureCtx = gestureCanvas?.getContext("2d");
 const threeCanvas = document.getElementById("three-canvas");
 
 let scene, camera, renderer, model, controls;
-let _THREE = null, _fbxLoader = null, _diffuseTexture = null, _normalTexture = null;
-
-async function loadKneeModel() {
-  if (!scene || !_THREE || !_fbxLoader) return;
-
-  if (model) {
-    scene.remove(model);
-    model = null;
-  }
-
-  try {
-    const fbxModel = await new Promise((resolve, reject) => {
-      _fbxLoader.load(
-        "../assets/knee/model.fbx",
-        (object) => resolve(object),
-        (progress) => {
-          const percent = (progress.loaded / progress.total) * 100;
-          console.log(`[SurgicalPlan] Loading model: ${percent.toFixed(1)}%`);
-        },
-        (error) => reject(error),
-      );
-    });
-
-    fbxModel.traverse((child) => {
-      if (child.isMesh) {
-        child.material = new _THREE.MeshStandardMaterial({
-          map: _diffuseTexture,
-          normalMap: _normalTexture,
-          roughness: 0.6,
-          metalness: 0.1,
-        });
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-
-    const box = new _THREE.Box3().setFromObject(fbxModel);
-    const center = box.getCenter(new _THREE.Vector3());
-    const size = box.getSize(new _THREE.Vector3());
-
-    fbxModel.position.sub(center);
-    const maxDim = Math.max(size.x, size.y, size.z);
-    fbxModel.scale.setScalar(3 / maxDim);
-    fbxModel.position.y -= 1.5;
-
-    model = fbxModel;
-    scene.add(model);
-
-    console.log("[SURGICAL_PLAN][MODEL] Model asset reloaded successfully");
-  } catch (error) {
-    console.error("[SURGICAL_PLAN][MODEL] Model reload failed:", error.message || error);
-
-    const placeholderGeom = new _THREE.SphereGeometry(1, 32, 32);
-    const placeholderMat = new _THREE.MeshStandardMaterial({
-      color: 0xe8dcc8,
-      roughness: 0.5,
-    });
-    model = new _THREE.Mesh(placeholderGeom, placeholderMat);
-    scene.add(model);
-  }
-}
 
 async function initThreeJS() {
   const THREE = await import("three");
-  _THREE = THREE;
   const { OrbitControls } =
     await import("three/addons/controls/OrbitControls.js");
   const { FBXLoader } = await import("three/addons/loaders/FBXLoader.js");
@@ -150,13 +88,62 @@ async function initThreeJS() {
   scene.add(rimLight);
 
   const textureLoader = new THREE.TextureLoader();
-  _diffuseTexture = textureLoader.load("../assets/knee/tex_u1_v1_diffuse.jpg");
-  _normalTexture = textureLoader.load("../assets/knee/tex_u1_v1_normal.jpg");
-  _diffuseTexture.colorSpace = THREE.SRGBColorSpace;
+  const diffuseTexture = textureLoader.load("../assets/knee/tex_u1_v1_diffuse.jpg");
+  const normalTexture = textureLoader.load("../assets/knee/tex_u1_v1_normal.jpg");
+  diffuseTexture.colorSpace = THREE.SRGBColorSpace;
 
-  _fbxLoader = new FBXLoader();
+  const fbxLoader = new FBXLoader();
 
-  await loadKneeModel();
+  try {
+    const fbxModel = await new Promise((resolve, reject) => {
+      fbxLoader.load(
+        "../assets/knee/model.fbx",
+        (object) => resolve(object),
+        (progress) => {
+          const percent = (progress.loaded / progress.total) * 100;
+          console.log(`[SurgicalPlan] Loading model: ${percent.toFixed(1)}%`);
+        },
+        (error) => reject(error),
+      );
+    });
+
+    fbxModel.traverse((child) => {
+      if (child.isMesh) {
+        child.material = new THREE.MeshStandardMaterial({
+          map: diffuseTexture,
+          normalMap: normalTexture,
+          roughness: 0.6,
+          metalness: 0.1,
+        });
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
+    const box = new THREE.Box3().setFromObject(fbxModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+
+    fbxModel.position.sub(center);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    fbxModel.scale.setScalar(3 / maxDim);
+    fbxModel.position.y -= 1.5;
+
+    model = fbxModel;
+    scene.add(model);
+
+    console.log("[SurgicalPlan] Knee model loaded successfully");
+  } catch (error) {
+    console.error("[SurgicalPlan] Error loading knee model:", error);
+
+    const placeholderGeom = new THREE.SphereGeometry(1, 32, 32);
+    const placeholderMat = new THREE.MeshStandardMaterial({
+      color: 0xe8dcc8,
+      roughness: 0.5,
+    });
+    model = new THREE.Mesh(placeholderGeom, placeholderMat);
+    scene.add(model);
+  }
 
   const gridHelper = new THREE.GridHelper(10, 20, 0x18b6ff, 0x0a1520);
   gridHelper.position.y = -2;
@@ -489,27 +476,17 @@ function adjustZoom(direction) {
   }
 }
 
-function resetModel() {
-  console.log('[SURGICAL_PLAN][MODEL] Reload requested');
+function resetView() {
   if (!camera || !controls) return;
-
   camera.position.set(0, 0, 6);
   camera.up.set(0, 1, 0);
   camera.lookAt(0, 0, 0);
   controls.target.set(0, 0, 0);
   controls.reset();
-
   state.zoom = 1;
-  state.currentView = 'front';
+  state.currentView = "front";
   updateZoomDisplay();
-  updateViewPresets('front');
-
-  console.log('[SURGICAL_PLAN][MODEL] Reset camera');
-
-  if (_fbxLoader && scene) {
-    console.log('[SURGICAL_PLAN][MODEL] Reloading current model asset...');
-    loadKneeModel();
-  }
+  updateViewPresets("front");
 }
 
 function goBack() {
@@ -681,6 +658,82 @@ function processStepsHandScroll(hands, gestureState) {
   }
 }
 
+// ─── Zone detection ──────────────────────────────────────────────────────────
+// Convert a normalized hand landmark position to viewport pixels.
+// Uses thumb–index midpoint (same point processSwipeGesture uses).
+function getHandScreenPoint(hands) {
+  const hand = hands?.[0];
+  if (!hand) return null;
+  const thumb = hand[4];
+  const index = hand[8];
+  if (!thumb || !index) return null;
+  const mx = (thumb.x + index.x) / 2;
+  const my = (thumb.y + index.y) / 2;
+  return {
+    x: (CONFIG.MIRROR ? 1 - mx : mx) * window.innerWidth,
+    y: my * window.innerHeight,
+  };
+}
+
+// Returns true if the screen point is inside the element's bounding rect,
+// shrunk by `margin` px on each side to avoid boundary flickering.
+function isPointInsideElement(pt, el, margin = 0) {
+  if (!pt || !el) return false;
+  const r = el.getBoundingClientRect();
+  return (
+    pt.x >= r.left + margin &&
+    pt.x <= r.right - margin &&
+    pt.y >= r.top + margin &&
+    pt.y <= r.bottom - margin
+  );
+}
+
+// Lazy-cached panel references (never change after DOM ready).
+let _modelPanelEl = null;
+let _stepsPanelEl = null;
+
+// Hysteresis state: require ZONE_FRAMES consecutive frames before entering model zone.
+const ZONE_FRAMES = 2;
+const ZONE_MARGIN = 10; // px inset
+let _modelFrameCount = 0;
+let _prevZone = "none";
+
+function getActiveZone(hands) {
+  if (!_modelPanelEl) _modelPanelEl = document.querySelector(".model-panel");
+  if (!_stepsPanelEl) _stepsPanelEl = document.querySelector(".steps-panel");
+
+  const pt = getHandScreenPoint(hands);
+  if (!pt) {
+    _modelFrameCount = 0;
+    return "none";
+  }
+
+  // Steps panel has priority – checked first.
+  if (isPointInsideElement(pt, _stepsPanelEl, ZONE_MARGIN)) {
+    _modelFrameCount = 0;
+    return "steps";
+  }
+
+  if (isPointInsideElement(pt, _modelPanelEl, ZONE_MARGIN)) {
+    _modelFrameCount = Math.min(_modelFrameCount + 1, ZONE_FRAMES);
+  } else {
+    _modelFrameCount = Math.max(_modelFrameCount - 1, 0);
+  }
+
+  const zone = _modelFrameCount >= ZONE_FRAMES ? "model" : "none";
+
+  if (zone !== _prevZone) {
+    if (zone === "model") {
+      console.log("[SURGICAL_PLAN][ZONE] hand inside model viewer");
+    } else if (_prevZone === "model") {
+      console.log("[SURGICAL_PLAN][ZONE] hand outside model viewer - model interaction ignored");
+    }
+    _prevZone = zone;
+  }
+
+  return zone;
+}
+
 function onResults(results) {
   const hands = results.multiHandLandmarks || [];
   const handedness = results.multiHandedness || [];
@@ -709,16 +762,11 @@ function onResults(results) {
     if (hand?.pinch?.confirmed) {
       gestures.push("🤏 PINCH!");
       showGestureFeedback("pinch", true);
-    } else if (hand?.pinch?.detected) {
-      gestures.push("🤏 pinch...");
-      showGestureFeedback("pinch", false);
     }
 
     if (hand?.openHand?.confirmed) {
       gestures.push("🖐️ OPEN");
       showGestureFeedback("openHand", true);
-    } else if (hand?.openHand?.detected) {
-      gestures.push("🖐️ open...");
     }
 
     if (hand?.closedFist?.confirmed) {
@@ -741,7 +789,12 @@ function onResults(results) {
 
   processSurgicalPlanGestures(hands, gestureState);
 
-  const swipe = processSwipeGesture(hands, gestureState);
+  // Model rotation only when the hand is inside the model viewer panel.
+  // Pass empty hands outside that zone so processSwipeGesture resets its state
+  // (prevents a jump when re-entering the zone).
+  const activeZone = getActiveZone(hands);
+  const swipeHands = activeZone === "model" ? hands : [];
+  const swipe = processSwipeGesture(swipeHands, gestureState);
   if (swipe && model) {
     model.rotation.y += swipe.deltaX * 2;
     model.rotation.x += swipe.deltaY * 2;
@@ -778,7 +831,6 @@ async function init() {
     onMicToggle: (element) => toggleVoiceRecording(element),
     onExpandNotes: openNotesModal,
     onCloseModal: closeNotesModal,
-    onModelReset: resetModel,
   });
 
   renderSteps();
@@ -866,7 +918,7 @@ function setupClickHandlers() {
 
   document
     .getElementById("btn-reset-view")
-    ?.addEventListener("click", resetModel);
+    ?.addEventListener("click", resetView);
 
   document.getElementById("btn-record")?.addEventListener("click", (e) => {
     const micBtn = e.target.closest(".mic-btn");
@@ -922,17 +974,6 @@ function setupClickHandlers() {
     }
   });
 
-  // Camera watchdog UI feedback
-  document.addEventListener("hand-tracking:restarting", () => {
-    const el = document.getElementById("hand-status-text");
-    if (el) el.textContent = "Reconnecting...";
-    const latEl = document.getElementById("latency");
-    if (latEl) latEl.textContent = "—";
-  });
-  document.addEventListener("hand-tracking:restarted", () => {
-    const el = document.getElementById("hand-status-text");
-    if (el) el.textContent = "No Hand";
-  });
 }
 
 init();
