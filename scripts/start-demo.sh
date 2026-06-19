@@ -82,12 +82,13 @@ JAVA_VER=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}' | cut -d. -f1)
 echo "  Java:  $(java -version 2>&1 | head -1)"
 echo "  Maven: $(mvn -version 2>&1 | head -1)"
 
-# ── infra (RabbitMQ) ─────────────────────────────────────────────────────────
+# ── infra (RabbitMQ + PostgreSQL) ────────────────────────────────────────────
 
 echo ""
-blue "→ Starting RabbitMQ infra..."
+blue "→ Starting infra (RabbitMQ + PostgreSQL)..."
 docker compose -f "$ROOT/docker-compose.infra.yml" up -d
-wait_for_port "RabbitMQ" 5672
+wait_for_port "RabbitMQ"  5672
+wait_for_port "PostgreSQL" 5432
 
 # ── logs dir ─────────────────────────────────────────────────────────────────
 

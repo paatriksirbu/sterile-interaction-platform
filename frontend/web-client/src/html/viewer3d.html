@@ -1,23 +1,16 @@
 <!doctype html>
-<html lang="es">
-
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>3D Viewer</title>
+  <title>Radiology - OR Touchless</title>
 
-
-  <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/viewer3d.css">
   <link rel="stylesheet" href="../css/hand-tracking.css">
   <link rel="stylesheet" href="../css/fontawesome-local.css">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 
-
-
-
-  <!-- Import map  -->
   <script type="importmap">
   {
     "imports": {
@@ -28,9 +21,7 @@
   </script>
 </head>
 
-
 <body class="mediscan">
-
 
   <!-- Pinch Cursor -->
   <div id="pinch-cursor" aria-hidden="true">
@@ -38,7 +29,6 @@
     <div class="fill"></div>
     <div class="dot"></div>
   </div>
-
 
   <!-- Hand Tracking HUD -->
   <div class="hand-tracking-hud" id="hand-tracking-hud">
@@ -63,12 +53,11 @@
         <span id="warmup-percent">0%</span>
       </div>
       <div class="warmup-bar">
-        <div class="warmup-fill" id="warmup-fill" style="width: 0%"></div>
+        <div class="warmup-fill" id="warmup-fill" style="width: 0"></div>
       </div>
     </div>
     <div class="stability-indicator" id="stability-indicator"></div>
   </div>
-
 
   <!-- Gesture Feedback Badge -->
   <div class="gesture-feedback-badge" id="gesture-feedback-badge">
@@ -76,114 +65,106 @@
     <span id="gesture-feedback-text">Pinch detected</span>
   </div>
 
+  <div class="root">
 
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <button class="btn-back" onclick="history.back()" type="button">
-      <span class="icon">←</span> BACK
-    </button>
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="btn-back" id="btn-back-dashboard" onclick="history.back()" type="button">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>DASHBOARD</span>
+      </button>
 
-
-    <div class="titleblock">
-      <div class="title">MEDISCAN OR V2.4</div>
-      <div class="subtitle">
-        Patient ID: 98234-A &nbsp;·&nbsp; Series: Torso MRI (T2 Weighted)
-      </div>
-    </div>
-
-
-    <div class="statusblock">
-      <span class="pill sensor">
-        <span class="dot"></span> SENSOR ACTIVE
-      </span>
-      <div class="userchip">
-        <div class="usertext">
-          <div class="small">Logged in as</div>
-          <div class="name">Dr. Aris Thorne</div>
+      <div class="title-block">
+        <div class="title-main">
+          <i class="fa-solid fa-x-ray"></i>
+          <h1>RADIOLOGY VIEWER</h1>
         </div>
-        <div class="avatar"></div>
-      </div>
-    </div>
-  </header>
-
-
-  <!-- MAIN -->
-  <main id="workarea" class="workarea fullscreenStage">
-    <!-- Canvas 3D -->
-    <canvas id="three-canvas"></canvas>
-
-
-    <!-- ✅ Overlay: IMPORTANTE que NO capture clicks -->
-    <canvas id="overlay"></canvas>
-
-
-    <!-- ✅ Video oculto correctamente (no display:none) -->
-    <video class="input_video" autoplay muted playsinline
-      style="position:fixed; left:-10000px; top:0; width:1px; height:1px; opacity:0; pointer-events:none;">
-    </video>
-
-
-    <div id="info" class="info-panel"></div>
-
-
-    <!-- ✅ Opcional: etiqueta del modelo actual -->
-    <div id="modelLabel" class="modelLabel" aria-hidden="true"></div>
-
-
-    <!-- ✅ Flechas (botones reales) -->
-    <button id="btn-prev" class="navCircle navLeft" aria-label="Prev" type="button">‹</button>
-    <button id="btn-next" class="navCircle navRight" aria-label="Next" type="button">›</button>
-
-
-    <!-- Bottom left: zoom -->
-    <section class="bottomLeft">
-      <div class="hintRow">
-        <span class="hintIcon">🖐️</span>
-        <span>TWO-HAND PINCH TO ZOOM | PINCH + DRAG TO MOVE</span>
-        <span id="zoom-indicator" class="zoomValue">145%</span>
+        <span class="title-sub">Patient ID: 98234-A &nbsp;·&nbsp; Series: Torso MRI (T2 Weighted)</span>
       </div>
 
-
-      <div class="zoomPanel">
-        <input id="zoomSlider" class="zoomSlider" type="range" min="50" max="200" value="145">
-        <div class="minmax">
-          <span>MIN (50%)</span>
-          <span>MAX (200%)</span>
+      <div class="status-right">
+        <div class="gesture-state">
+          <span class="label">GESTURE</span>
+          <span class="value" id="gesture-status">Tracking</span>
         </div>
-
-
-        <div class="zoomButtons">
-          <button id="btn-zoom-out" class="miniBtn" type="button">-</button>
-          <button id="btn-zoom-in" class="miniBtn" type="button">+</button>
+        <div class="user-chip">
+          <div class="chip-avatar"><i class="fa-solid fa-user-md"></i></div>
+          <span>Dr. Aris Thorne</span>
         </div>
       </div>
-    </section>
+    </header>
 
+    <!-- MAIN VIEWER -->
+    <main id="workarea" class="workarea fullscreenStage">
+      <canvas id="three-canvas"></canvas>
+      <canvas id="overlay"></canvas>
 
-    <!-- Bottom right: depth -->
-    <section class="bottomRight">
-      <div class="depthCard">
-        <canvas id="depthCanvas" width="260" height="120"></canvas>
-        <div class="depthLabel">DEPTH SENSOR 01</div>
-      </div>
-    </section>
-  </main>
+      <video class="input_video" autoplay muted playsinline
+        style="position:fixed; left:-10000px; top:0; width:1px; height:1px; opacity:0; pointer-events:none;">
+      </video>
 
+      <div id="info" class="info-panel"></div>
+      <div id="modelLabel" class="modelLabel" aria-hidden="true"></div>
 
-  <!-- ✅ MediaPipe (OBLIGATORIO) - antes del módulo -->
+      <!-- Navigation arrows -->
+      <button id="btn-prev" class="navCircle navLeft" aria-label="Previous model" type="button">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button id="btn-next" class="navCircle navRight" aria-label="Next model" type="button">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <!-- Bottom left: zoom controls -->
+      <section class="bottomLeft">
+        <div class="hintRow">
+          <span><i class="fa-solid fa-hand-pointer"></i> TWO-HAND PINCH TO ZOOM &nbsp;·&nbsp; PINCH + DRAG TO MOVE</span>
+          <span id="zoom-indicator" class="zoomValue">145%</span>
+        </div>
+        <div class="zoomPanel">
+          <input id="zoomSlider" class="zoomSlider" type="range" min="50" max="200" value="145">
+          <div class="minmax">
+            <span>50%</span>
+            <span>200%</span>
+          </div>
+          <div class="zoomButtons">
+            <button id="btn-zoom-out" class="miniBtn" type="button">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <button id="btn-zoom-in" class="miniBtn" type="button">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom right: depth sensor preview -->
+      <section class="bottomRight">
+        <div class="depthCard">
+          <canvas id="depthCanvas" width="260" height="120"></canvas>
+          <div class="depthLabel">HAND TRACKING PREVIEW</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER HINTS -->
+    <footer class="footer-hints">
+      <span><i class="fa-solid fa-hand-pointer"></i> PINCH + HOLD TO SELECT</span>
+      <span><i class="fa-solid fa-arrows-rotate"></i> LEFT PINCH TO ROTATE</span>
+      <span><i class="fa-solid fa-up-down-left-right"></i> RIGHT PINCH TO MOVE</span>
+      <span><i class="fa-solid fa-magnifying-glass-plus"></i> TWO-HAND PINCH TO ZOOM</span>
+      <span class="right">RADIOLOGY v1.0</span>
+    </footer>
+
+  </div><!-- /.root -->
+
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <!-- Opcional -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 
-
-  <!-- TU APP -->
   <script type="module" src="../js/viewer3d/viewer3d.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@6/bundles/stomp.umd.min.js"></script>
   <script src="../js/services/notificationService.js"></script>
 </body>
 
-
 </html>
-

@@ -94,6 +94,7 @@ echo ""
 blue "── Infrastructure ──"
 check_port  "RabbitMQ AMQP" 5672
 check_port  "RabbitMQ UI  " 15672
+check_port  "PostgreSQL    " 5432
 echo ""
 
 # ── backend services: port checks ─────────────────────────────────────────────
@@ -141,17 +142,57 @@ echo ""
 if $SMOKE; then
   blue "── Smoke tests (--smoke) ──"
 
+  GESTURE_SMOKE_SESSION="smoke-session-$$"
+
   smoke_post "gateway→gesture-service" \
     "http://localhost:8080/api/gestures" \
-    '{"sessionId":"smoke-session","gestureType":"PINCH","confidence":0.95}'
+    "{\"sessionId\":\"$GESTURE_SMOKE_SESSION\",\"gestureType\":\"PINCH\",\"confidence\":0.95}"
 
   smoke_post "gesture-service (direct)" \
     "http://localhost:8082/api/gestures" \
-    '{"sessionId":"smoke-session","gestureType":"PINCH","confidence":0.95}'
+    "{\"sessionId\":\"$GESTURE_SMOKE_SESSION\",\"gestureType\":\"PINCH\",\"confidence\":0.95}"
 
-  smoke_post "annotation-service" \
+  # Allow a moment for the event pipeline to persist the session
+  sleep 2
+
+  # Verify the session was persisted and is retrievable via GET
+  session_http=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 \
+    "http://localhost:8084/api/sessions/$GESTURE_SMOKE_SESSION" 2>/dev/null || echo "000")
+  if [[ "$session_http" == "200" ]]; then
+    green "  PASS  session-service GET /api/sessions/$GESTURE_SMOKE_SESSION ($session_http) — session persisted in DB"
+    PASS=$((PASS+1))
+  else
+    red   "  FAIL  session-service GET /api/sessions/$GESTURE_SMOKE_SESSION ($session_http) — session not found"
+    FAIL=$((FAIL+1))
+  fi
+
+  # Also check list endpoint returns an array
+  sessions_body=$(curl -s --max-time 5 "http://localhost:8084/api/sessions" 2>/dev/null || echo "[]")
+  sessions_count=$(echo "$sessions_body" | grep -o '"sessionId"' | wc -l | tr -d ' ')
+  if [[ "$sessions_count" -ge 1 ]]; then
+    green "  PASS  session-service GET /api/sessions — found $sessions_count session(s)"
+    PASS=$((PASS+1))
+  else
+    red   "  FAIL  session-service GET /api/sessions — 0 sessions returned"
+    FAIL=$((FAIL+1))
+  fi
+
+  SMOKE_SESSION="check-demo-smoke-$$"
+  smoke_post "annotation-service POST" \
     "http://localhost:8088/api/annotations" \
-    '{"sessionId":"check-demo-smoke","resourceId":"surgical-pdf-main","annotationText":"smoke test","viewerType":"PDF"}'
+    "{\"sessionId\":\"$SMOKE_SESSION\",\"resourceId\":\"surgical-pdf-main\",\"annotationText\":\"smoke test\",\"viewerType\":\"PDF\"}"
+
+  # GET annotations by sessionId — expect at least one result
+  get_body=$(curl -s --max-time 5 \
+    "http://localhost:8088/api/annotations?sessionId=$SMOKE_SESSION" 2>/dev/null || echo "[]")
+  count=$(echo "$get_body" | grep -o '"id"' | wc -l | tr -d ' ')
+  if [[ "$count" -ge 1 ]]; then
+    green "  PASS  annotation-service GET → found $count annotation(s) for session $SMOKE_SESSION"
+    PASS=$((PASS+1))
+  else
+    red   "  FAIL  annotation-service GET → 0 annotations for session $SMOKE_SESSION (DB persistence may be broken)"
+    FAIL=$((FAIL+1))
+  fi
 
   smoke_post "speech-service" \
     "http://localhost:8087/api/speech/transcriptions" \

@@ -431,6 +431,9 @@
 .fa-circle-check::before {
   content: "\f058";
 }
+.fa-x-ray::before {
+  content: "\f497";
+}
 .fa-list-check::before {
   content: "\e1b5";
 }

@@ -53,6 +53,96 @@ const pinchClick = {
   target: null,
 };
 
+function getButtonName(el) {
+  if (!el) return "unknown";
+  if (el.id === "btn-prev") return "prev";
+  if (el.id === "btn-next") return "next";
+  if (el.id === "btn-zoom-in") return "zoom-in";
+  if (el.id === "btn-zoom-out") return "zoom-out";
+  if (el.classList.contains("btn-back")) return "back";
+  return el.id || el.tagName.toLowerCase();
+}
+
+// Convert normalized hand position (thumb-index midpoint) to viewport
+// coordinates, matching the system used by getBoundingClientRect().
+function getHandScreenPoint(mid) {
+  if (!mid) return null;
+  const overlayEl = document.getElementById("overlay");
+  if (!overlayEl) return null;
+  const cr = overlayEl.getBoundingClientRect();
+  const xRaw = CONFIG.MIRROR ? 1 - mid.x : mid.x;
+  return {
+    x: cr.left + xRaw * cr.width,
+    y: cr.top + mid.y * cr.height,
+  };
+}
+
+// Returns true if the screen point is inside the element's bounding rect,
+// shrunk by `margin` px on each side to avoid boundary flickering.
+function isPointInsideElement(pt, el, margin = 0) {
+  if (!pt || !el) return false;
+  const r = el.getBoundingClientRect();
+  return (
+    pt.x >= r.left + margin &&
+    pt.x <= r.right - margin &&
+    pt.y >= r.top + margin &&
+    pt.y <= r.bottom - margin
+  );
+}
+
+// ─── Zone-based gesture routing ──────────────────────────────────────────
+// Priority: UI buttons/controls > other UI panels > 3D model viewer area.
+// Hysteresis (ZONE_FRAMES) on entering "model" avoids flicker at the
+// workarea boundary, mirroring surgical_plan's getActiveZone().
+const CONTROL_SELECTORS = ".btn-back, .navCircle, .miniBtn, .zoomSlider";
+const ZONE_FRAMES = 2;
+let _workareaEl = null;
+let _modelFrameCount = 0;
+let _prevZone = "none";
+
+function logZoneChange(zone) {
+  if (zone !== _prevZone) {
+    if (zone === "controls" || zone === "model") {
+      console.log(`[VIEWER3D][ZONE] active zone: ${zone}`);
+    }
+    _prevZone = zone;
+  }
+  return zone;
+}
+
+function getActiveZone(screenPoint) {
+  if (!_workareaEl) _workareaEl = document.getElementById("workarea");
+  if (!screenPoint) {
+    _modelFrameCount = 0;
+    return logZoneChange("none");
+  }
+
+  // 1. UI buttons/controls have top priority.
+  const overControl = [...document.querySelectorAll(CONTROL_SELECTORS)].some(
+    (el) => isPointInsideElement(screenPoint, el, 10),
+  );
+
+  // 2. other interactive UI panels (zoom + depth preview cards)
+  const overPanel =
+    isPointInsideElement(screenPoint, document.querySelector(".bottomLeft")) ||
+    isPointInsideElement(screenPoint, document.querySelector(".bottomRight"));
+
+  if (overControl || overPanel) {
+    _modelFrameCount = 0;
+    return logZoneChange("controls");
+  }
+
+  // 3. 3D model viewer area (hysteresis avoids edge flicker)
+  if (isPointInsideElement(screenPoint, _workareaEl)) {
+    _modelFrameCount = Math.min(_modelFrameCount + 1, ZONE_FRAMES);
+  } else {
+    _modelFrameCount = Math.max(_modelFrameCount - 1, 0);
+  }
+
+  const zone = _modelFrameCount >= ZONE_FRAMES ? "model" : "none";
+  return logZoneChange(zone);
+}
+
 // --- suavizado de deltas (quita jitter sin lag fuerte) ---
 function smoothDelta(prev, next, alpha = 0.35) {
   return prev + (next - prev) * alpha;
@@ -110,6 +200,9 @@ function resetAll() {
 
   filt.moveDx = filt.moveDy = 0;
   filt.rotDx = filt.rotDy = 0;
+
+  _modelFrameCount = 0;
+  _prevZone = "none";
 
   airRuler.clearAll();
   handCursor.reset();
@@ -318,24 +411,33 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
   }
 
   // =============================
+  // Zone detection (Controls vs Model viewer) - priority routing
+  // =============================
+  const cursorHand = right || info[0] || null;
+  const screenPoint = getHandScreenPoint(cursorHand?.mid);
+  const activeZone = getActiveZone(screenPoint);
+
+  // =============================
   // UI click por pinch-hold (Back + Prev/Next)
   // =============================
-  const PINCH_CLICK_HOLD_MS = 90;
+  const PINCH_CLICK_HOLD_MS = 300; // 300ms dwell for reliable, non-accidental activation
 
   let uiTargetBtn = null;
+
   if (right && right.state.pinchActive && right.mid) {
-    const px = right.mid.x * canvasW;
-    const py = right.mid.y * canvasH;
+    const pinchScreen = getHandScreenPoint(right.mid);
+    const px = pinchScreen?.x ?? -1;
+    const py = pinchScreen?.y ?? -1;
 
-    // padding interior para evitar activación accidental
-    const backBtn = elementAtPinch(px, py, ".btn-back", 10);
-    const prevBtn = elementAtPinch(px, py, "#btn-prev", 10);
-    const nextBtn = elementAtPinch(px, py, "#btn-next", 10);
+    const backBtn   = elementAtPinch(px, py, ".btn-back",     10);
+    const prevBtn   = elementAtPinch(px, py, "#btn-prev",     10);
+    const nextBtn   = elementAtPinch(px, py, "#btn-next",     10);
+    const zoomInBtn = elementAtPinch(px, py, "#btn-zoom-in",  10);
+    const zoomOutBtn= elementAtPinch(px, py, "#btn-zoom-out", 10);
 
-    uiTargetBtn = backBtn || prevBtn || nextBtn;
+    uiTargetBtn = backBtn || prevBtn || nextBtn || zoomInBtn || zoomOutBtn;
 
     if (uiTargetBtn) {
-      // armamos estado de click SOLO cuando estás dentro de un botón
       if (!pinchClick.active || pinchClick.target !== uiTargetBtn) {
         pinchClick.active = true;
         pinchClick.startT = now;
@@ -345,11 +447,14 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
         const dt = now - pinchClick.startT;
         if (!pinchClick.fired && dt > PINCH_CLICK_HOLD_MS) {
           pinchClick.fired = true;
+          const btnName = getButtonName(uiTargetBtn);
+          console.log(`[RADIOLOGY][GESTURE] Button selected: ${btnName}`);
+          if (btnName === "back") {
+            console.log("[VIEWER3D][GESTURE] Dashboard button selected");
+          }
           uiTargetBtn.click();
         }
       }
-      // si estás clicando UI, NO muevas el modelo (para que no “arrastres” botones)
-      // pero tampoco hacemos un return global: simplemente saltamos move/rotate/zoom más abajo
     } else {
       pinchClick.active = false;
       pinchClick.startT = 0;
@@ -363,8 +468,9 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
     pinchClick.target = null;
   }
 
-  // Si estamos sobre UI, no aplicamos gestos al modelo (fluye porque no “corta” el tracking global)
-  const blockingModelGesturesBecauseUI = !!uiTargetBtn;
+  // Model gestures (move/rotate/zoom) only run while the hand point is
+  // inside the 3D model viewer area, per getActiveZone() above.
+  const blockingModelGesturesBecauseUI = activeZone !== "model";
 
   // =============================
   // Zoom 2 manos (solo si NO estamos en UI y NO está AirRuler activo)
