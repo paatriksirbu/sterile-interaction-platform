@@ -30,20 +30,3 @@ export function triggerDashboardAction(action) {
   }
 }
 
-
-// Opcional: hover/selección por otros gestos
-export function highlightTile(action) {
-  document.querySelectorAll(".tile").forEach((t) => t.classList.remove("hover"));
-  const t = document.querySelector(`.tile[data-action="${action}"]`);
-  if (t) t.classList.add("hover");
-}
-
-
-export function gestureClickTile(action) {
-  triggerDashboardAction(action);
-}
-
-
-
-
-

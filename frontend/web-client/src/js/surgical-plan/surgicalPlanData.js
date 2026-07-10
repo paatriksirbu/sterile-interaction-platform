@@ -81,8 +81,6 @@ export const MODEL_VIEWS = {
   posterior: { position: [0, 0, -6], target: [0, 0, 0], up: [0, 1, 0] },
 };
 
-export const SAMPLE_NOTES = [];
-
 export function getCountdown(
   scheduledTime = "09:30",
   currentDate = new Date(),

@@ -88,17 +88,3 @@ export function drawHighlightedLandmark(
   drawPoint(ctx, pos.x, pos.y, radius + 4, `${color}33`);
   drawPoint(ctx, pos.x, pos.y, radius, color);
 }
-
-// Dibuja múltiples landmarks resaltados
-export function drawHighlightedLandmarks(
-  ctx,
-  landmarks,
-  canvas,
-  color = "yellow",
-) {
-  if (!landmarks) return;
-
-  landmarks.forEach((lm) => {
-    drawHighlightedLandmark(ctx, lm, canvas, color, 6);
-  });
-}

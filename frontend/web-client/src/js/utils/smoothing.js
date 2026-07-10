@@ -38,7 +38,3 @@ export function smoothAndPredict(id, target, alpha = 0.5, predict = 0.06) {
 export function resetSmoothing(id) {
   smoothingStates.delete(id);
 }
-
-export function resetAllSmoothing() {
-  smoothingStates.clear();
-}

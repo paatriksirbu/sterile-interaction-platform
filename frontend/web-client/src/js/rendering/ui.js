@@ -32,38 +32,6 @@ export function generateLandmarksPanel(multiHandLandmarks, multiHandedness) {
 }
 
 /**
- * Obtiene el nombre descriptivo de un landmark por su índice
- * @param {number} index - Índice del landmark (0-20)
- * @returns {string} Nombre del landmark
- */
-function getLandmarkName(index) {
-  const names = [
-    "WRIST", // 0
-    "THUMB_CMC", // 1
-    "THUMB_MCP", // 2
-    "THUMB_IP", // 3
-    "THUMB_TIP", // 4
-    "INDEX_MCP", // 5
-    "INDEX_PIP", // 6
-    "INDEX_DIP", // 7
-    "INDEX_TIP", // 8
-    "MIDDLE_MCP", // 9
-    "MIDDLE_PIP", // 10
-    "MIDDLE_DIP", // 11
-    "MIDDLE_TIP", // 12
-    "RING_MCP", // 13
-    "RING_PIP", // 14
-    "RING_DIP", // 15
-    "RING_TIP", // 16
-    "PINKY_MCP", // 17
-    "PINKY_PIP", // 18
-    "PINKY_DIP", // 19
-    "PINKY_TIP", // 20
-  ];
-  return names[index] || "UNKNOWN";
-}
-
-/**
  * Genera el texto del panel de estado de gestos
  * @param {Object} gestureState - Estado de los gestos del detector
  * @param {number} zoom - Zoom actual
@@ -180,71 +148,8 @@ export function updateInfoElement(element, text) {
 }
 
 /**
- * Genera el HTML de la leyenda de colores
- * @returns {string} HTML de la leyenda
- */
-export function generateColorLegend() {
-  return `
-    <span style="color: ${CONFIG.COLORS.Left};">● Left</span> |
-    <span style="color: ${CONFIG.COLORS.Right};">● Right</span> |
-    <span style="color: ${CONFIG.COLORS.Unknown};">● Unknown</span>
-  `;
-}
-
-/**
- * Genera el HTML del panel de información principal
- * @returns {string} HTML del panel
- */
-// export function generateInfoPanelHTML() {
-//   return `
-//     👋 Esqueleto de manos + cuadrado interactivo.<br />
-//     📌 Panel a la derecha: 21 landmarks (x, y, z) por mano.<br />
-//     🪞 Modo espejo activado.<br />
-//     <br />
-//     <b>Gestos activos:</b><br />
-//     🤏 <b>Pinch</b>: Zoom global (pulgar-índice)<br />
-//     <!--     👉 <b>Pointing</b>: Detección de dedo apuntando<br />
-//     🌐 <b>Esférico</b>: Agarre esférico<br />
-//     ✊ <b>Puño cerrado</b>: Detecta puño completamente cerrado<br />
-//     🖐️ <b>Mano abierta</b>: Navegacion/Scroll<br />
-//     <br />
-//     <b>Cuadrado interactivo:</b><br />
-//     ✋ <b>Mover</b>: Pinch pulgar-índice O agarre esférico sobre cuadrado<br />
-//     ➕ <b>Duplicar</b>: Tocar pulgar-anular (máx ${CONFIG.SQUARES.MAX_COUNT}) -->
-//   `;
-// }
-
-/**
  * Actualiza los badges de estado de gestos
-
-
-export function updateGestureBadges(gestureState) {
-  const badges = {
-    'dot-pinch': gestureState.pinch,
-    'dot-pointing': gestureState.pointing,
-    'dot-spherical': gestureState.spherical,
-    'dot-fist': gestureState.closedFist,
-    'dot-openhand': gestureState.openHand
-  };
-
-
-  for (const [id, state] of Object.entries(badges)) {
-    const dot = document.getElementById(id);
-    if (!dot) continue;
-
-
-    dot.classList.remove('off', 'detecting', 'confirmed');
-    if (state?.confirmed) {
-      dot.classList.add('confirmed');
-    } else if (state?.detected) {
-      dot.classList.add('detecting');
-    } else {
-      dot.classList.add('off');
-    }
-  }
-}
-  */
-
+ */
 export function updateGestureBadges(gestureState) {
   // SOLO PINCH Y OPEN HAND, LOS DEMÁS SE MUESTRAN COMO "OFF" SI EXISTEN
   const pinchDot = document.getElementById("dot-pinch");

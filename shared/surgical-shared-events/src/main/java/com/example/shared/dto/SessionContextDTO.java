@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.Instant;
-import java.util.Map;
 
 @Data
 @Builder
@@ -24,5 +23,4 @@ public class SessionContextDTO {
     private InteractionCommandType lastAction;
     private Instant createdAt;
     private Instant updatedAt;
-    private Map<String, Object> viewerState;
 }

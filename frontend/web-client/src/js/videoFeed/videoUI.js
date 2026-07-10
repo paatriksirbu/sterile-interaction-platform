@@ -238,28 +238,3 @@ function initKeyboardShortcuts() {
   });
 }
 
-/**
- * Muestra una notificación temporal
- */
-export function showNotification(message, duration = 2000) {
-  // Crear elemento de notificación
-  const notification = document.createElement("div");
-  notification.className = "video-notification";
-  notification.textContent = message;
-  notification.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 16px 32px;
-        background: rgba(0,0,0,0.85);
-        color: #fff;
-        font-size: 18px;
-        border-radius: 8px;
-        z-index: 1000;
-        animation: fadeInOut ${duration}ms ease;
-    `;
-
-  document.body.appendChild(notification);
-  setTimeout(() => notification.remove(), duration);
-}

@@ -124,7 +124,7 @@ const airRuler = getAirRuler();
 function animateOverlay() {
   clearOverlay(ctx, overlay);
 
-  handCursor.draw(ctx, overlay, { mirror: CONFIG.MIRROR });
+  // Canvas cursor disabled — #pinch-cursor div handles full-viewport cursor display
 
   airRuler.drawOverlay(ctx, {
     camera: threeViewer.getCamera(),

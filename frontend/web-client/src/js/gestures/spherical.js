@@ -44,16 +44,3 @@ export function detectSphericalGrip(landmarks) {
   // Al menos 3 dedos deben estar flexionados, y deben estar separados, pulgar extendido y alejado
   return flexedCount >= 3 && fingersSeparated && thumbExtended && thumbAway;
 }
-
-export function getSphericalGripCenter(landmarks) {
-  const l = getLandmarks(landmarks);
-  if (!l) return null;
-
-  const xRaw = (l.indexTip.x + l.middleTip.x + l.ringTip.x + l.pinkyTip.x) / 4;
-  const yRaw = (l.indexTip.y + l.middleTip.y + l.ringTip.y + l.pinkyTip.y) / 4;
-
-  return {
-    x: xRaw,
-    y: yRaw,
-  };
-}

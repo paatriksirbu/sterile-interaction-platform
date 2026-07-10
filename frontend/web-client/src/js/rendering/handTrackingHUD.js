@@ -456,24 +456,3 @@ export function hideHandTrackingHUD() {
   }
 }
 
-/**
- * Sets the HUD to compact mode (for smaller displays)
- */
-export function setCompactMode(compact = true) {
-  const hud = document.getElementById("hand-tracking-hud");
-  if (hud) {
-    hud.classList.toggle("compact", compact);
-  }
-}
-
-/**
- * Resets all hand tracking visualization state
- */
-export function resetHandTrackingState() {
-  htState.stabilityHistory = [];
-  htState.lastGestureFeedback = null;
-  if (htState.gestureFeedbackTimeout) {
-    clearTimeout(htState.gestureFeedbackTimeout);
-  }
-  hideHandTrackingHUD();
-}

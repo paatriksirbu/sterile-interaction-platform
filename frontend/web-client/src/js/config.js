@@ -9,7 +9,6 @@
 // }
 
 export const API_BASE_URL = 'http://localhost:8080';
-export const WS_BASE_URL  = 'http://localhost:8080';
 
 export const CONFIG = {
   // Modo espejo para cámara frontal (false = sin inversión, mano izquierda a la izquierda)

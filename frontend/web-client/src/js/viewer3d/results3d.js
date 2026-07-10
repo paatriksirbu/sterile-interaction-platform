@@ -64,16 +64,14 @@ function getButtonName(el) {
 }
 
 // Convert normalized hand position (thumb-index midpoint) to viewport
-// coordinates, matching the system used by getBoundingClientRect().
+// coordinates. We map to the full viewport so the cursor can reach UI
+// elements outside the workarea canvas (e.g. the topbar back button).
 function getHandScreenPoint(mid) {
   if (!mid) return null;
-  const overlayEl = document.getElementById("overlay");
-  if (!overlayEl) return null;
-  const cr = overlayEl.getBoundingClientRect();
   const xRaw = CONFIG.MIRROR ? 1 - mid.x : mid.x;
   return {
-    x: cr.left + xRaw * cr.width,
-    y: cr.top + mid.y * cr.height,
+    x: xRaw * window.innerWidth,
+    y: mid.y * window.innerHeight,
   };
 }
 
@@ -182,6 +180,25 @@ function getOrCreateHandState(key) {
   return st.hands.get(key);
 }
 
+// ── Pinch-cursor div update (full-viewport, covers topbar area) ───────────
+function updatePinchCursorDiv(screenPoint, isPinching, progress) {
+  const el = document.getElementById("pinch-cursor");
+  if (!el) return;
+  if (!screenPoint) {
+    el.classList.remove("show", "arming", "confirmed");
+    el.style.left = "-9999px";
+    el.style.top = "-9999px";
+    el.style.setProperty("--p", "0");
+    return;
+  }
+  el.style.left = `${screenPoint.x}px`;
+  el.style.top = `${screenPoint.y}px`;
+  el.classList.add("show");
+  el.style.setProperty("--p", String(progress));
+  el.classList.toggle("arming", isPinching && progress < 1);
+  el.classList.toggle("confirmed", isPinching && progress >= 1);
+}
+
 function resetAll() {
   st.hands.clear();
 
@@ -206,6 +223,8 @@ function resetAll() {
 
   airRuler.clearAll();
   handCursor.reset();
+
+  updatePinchCursorDiv(null, false, 0);
 }
 
 /**
@@ -429,7 +448,7 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
     const px = pinchScreen?.x ?? -1;
     const py = pinchScreen?.y ?? -1;
 
-    const backBtn   = elementAtPinch(px, py, ".btn-back",     10);
+    const backBtn   = elementAtPinch(px, py, ".btn-back",     -24);
     const prevBtn   = elementAtPinch(px, py, "#btn-prev",     10);
     const nextBtn   = elementAtPinch(px, py, "#btn-next",     10);
     const zoomInBtn = elementAtPinch(px, py, "#btn-zoom-in",  10);
@@ -466,6 +485,16 @@ export function onResults3D(results, { canvasW = 1, canvasH = 1 } = {}) {
     pinchClick.startT = 0;
     pinchClick.fired = false;
     pinchClick.target = null;
+  }
+
+  // ── Update #pinch-cursor div at full-viewport coordinates ────────────────
+  // This lets the cursor visually cross into the topbar where the back button lives.
+  {
+    const isPinching = cursorHand?.state?.pinchActive || false;
+    const progress = pinchClick.active
+      ? Math.min(1, (now - pinchClick.startT) / PINCH_CLICK_HOLD_MS)
+      : 0;
+    updatePinchCursorDiv(screenPoint, isPinching, progress);
   }
 
   // Model gestures (move/rotate/zoom) only run while the hand point is

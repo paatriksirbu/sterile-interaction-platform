@@ -101,33 +101,3 @@ export function drawText(
   ctx.fillText(text, x, y);
 }
 
-/**
- * Dibuja un rectángulo en el canvas
- * @param {CanvasRenderingContext2D} ctx - Contexto 2D
- * @param {number} x - Coordenada X (esquina superior izquierda)
- * @param {number} y - Coordenada Y (esquina superior izquierda)
- * @param {number} width - Ancho
- * @param {number} height - Alto
- * @param {string} fillColor - Color de relleno
- * @param {string} strokeColor - Color del borde (opcional)
- * @param {number} lineWidth - Grosor del borde
- */
-export function drawRect(
-  ctx,
-  x,
-  y,
-  width,
-  height,
-  fillColor = "white",
-  strokeColor = null,
-  lineWidth = 2,
-) {
-  ctx.fillStyle = fillColor;
-  ctx.fillRect(x, y, width, height);
-
-  if (strokeColor) {
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = lineWidth;
-    ctx.strokeRect(x, y, width, height);
-  }
-}

@@ -510,12 +510,6 @@ header {
     border-right: 1px solid #222;
 }
 
-#col-pager {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
 /* Área de trabajo del PDF = tamaño del canvas */
 #workarea {
     position: relative;
@@ -652,51 +646,6 @@ header {
 }
 
 /* ============================================================
-    MAXIMIZE/MINIMIZE CONTROL
-    ============================================================ */
-/* .maximize-btn {
-  position: fixed;
-  top: 70px;
-  right: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 28px 40px;
-  background: rgba(0, 0, 0, 0.85);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  cursor: pointer;
-  z-index: 100;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-}
-.maximize-btn:hover {
-  background: rgba(30, 30, 30, 0.95);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
-}
-.maximize-btn .max-icon {
-  font-size: 52px;
-  color: #fff;
-  line-height: 1;
-}
-.maximize-btn .max-label {
-  font-size: 18px;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-} */
-
-/* Estado maximizado del botón */
-/* .maximize-btn.is-maximized .max-icon::before {
-  content: '⛶';
-}
-.maximize-btn.is-maximized .max-label {
-  color: #4CAF50;
-} */
-
-/* ============================================================
     MAXIMIZED MODE - Layout changes
     ============================================================ */
 
@@ -728,20 +677,6 @@ body.maximized #scroll-rail:hover {
 /* Mover controles de zoom en modo maximizado */
 body.maximized #zoom-controls {
     bottom: 30px;
-}
-
-/* Indicador visual de modo maximizado */
-body.maximized .maximize-btn {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: rgba(76, 175, 80, 0.5);
-}
-
-body.maximized .maximize-btn .max-icon {
-    color: #4caf50;
-}
-
-body.maximized .maximize-btn .max-label {
-    color: #4caf50;
 }
 
 /* ============================================================

@@ -65,10 +65,3 @@ export function detectClosedFist(landmarks) {
     notSpherical
   );
 }
-
-export function isThumbRingTouching(landmarks) {
-  const l = getLandmarks(landmarks);
-  if (!l) return false;
-
-  return distance3D(l.thumbTip, l.ringTip) < CONFIG.THRESHOLDS.RING_TOGGLE;
-}
